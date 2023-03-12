@@ -9,7 +9,7 @@
 #include <iostream>
 
 // Application will be defined by client.
-extern Majkt::Application* Majkt::CreateApplication();
+extern majkt::Application* majkt::CreateApplication();
 
 int main(int argc, char** argv)
 {
@@ -18,7 +18,7 @@ int main(int argc, char** argv)
   	FLAGS_alsologtostderr = true;
 
 	LOG(INFO) << "Majkt Engine Started";
-	auto app = Majkt::CreateApplication();
+	auto app = majkt::CreateApplication();
 	app->Run();
 	delete app;
 	LOG(INFO) << "Majkt Engine Ended";

@@ -1,6 +1,6 @@
 #include "src/lib/majkt_export.h"
 
-class Sandbox : public Majkt::Application
+class Sandbox : public majkt::Application
 {
 public:
 	Sandbox()
@@ -12,7 +12,7 @@ public:
 	}
 };
 
-Majkt::Application* Majkt::CreateApplication()
+majkt::Application* majkt::CreateApplication()
 {
 	return new Sandbox();
 }

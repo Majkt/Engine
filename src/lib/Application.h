@@ -2,8 +2,9 @@
 #define MAJKT_ENGINE_APLICATION_H_
 
 #include "src/lib/core/base_export.h"
+#include "src/lib/events/event.h"
 
-namespace Majkt 
+namespace majkt 
 {
 	class MAJKT_BASE_EXPORT Application
 	{
