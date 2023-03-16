@@ -1,7 +1,10 @@
 #ifndef MAJKT_CORE_BASE_EXPORT_H_
 #define MAJKT_CORE_BASE_EXPORT_H_
 
+#include "src/lib/core/platform_detection.h"
+
 #if defined(MAJKT_PLATFORM_WINDOWS)
+
 	#if defined(WIN32)
 
 		#if defined(MAJKT_BASE_IMPLEMENTATION)
@@ -18,7 +21,10 @@
 		#endif
 	#endif
 
-#else  // defined(MAJKT_PLATFORM_WINDOWS)
+#elif defined(MAJKT_PLATFORM_MACOS)
+	#define MAJKT_BASE_EXPORT
+
+#else  
 	#define MAJKT_BASE_EXPORT
 #endif
 

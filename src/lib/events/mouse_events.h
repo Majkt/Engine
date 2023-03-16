@@ -10,22 +10,22 @@ class MAJKT_BASE_EXPORT MouseMovedEvent : public Event
 {
     public:
         MouseMovedEvent(float x, float y)
-            : m_MouseX(x), m_MouseY(y) {}
+            : mouseX_(x), mouseY_(y) {}
 
-        inline float GetX() const { return m_MouseX; }
-        inline float GetY() const { return m_MouseY; }
+        inline float GetX() const { return mouseX_; }
+        inline float GetY() const { return mouseY_; }
 
         std::string ToString() const override
         {
             std::stringstream ss;
-            ss << "MouseMovedEvent: " << m_MouseX << ", " << m_MouseY;
+            ss << "MouseMovedEvent: " << mouseX_ << ", " << mouseY_;
             return ss.str();
         }
 
         EVENT_CLASS_TYPE(kMouseMoved)
         EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryMouse |EventCategory:: kEventCategoryInput)
     private:
-        float m_MouseX, m_MouseY;
+        float mouseX_, mouseY_;
 };
 
 class MAJKT_BASE_EXPORT MouseScrolledEvent : public Event

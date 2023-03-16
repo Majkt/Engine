@@ -3,6 +3,9 @@
 
 #include "src/lib/core/base_export.h"
 #include "src/lib/events/event.h"
+#include "src/lib/core/window.h"
+
+#include <memory>
 
 namespace majkt 
 {
@@ -13,6 +16,9 @@ namespace majkt
 		virtual ~Application();
 
 		void Run();
+	private:
+		std::unique_ptr<Window> window_;
+		bool running_{true};
     };
 
 	// To be defined in CLIENT

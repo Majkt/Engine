@@ -5,4 +5,3 @@ cc_binary(
     srcs = ["sandbox_app.cc"],
     deps = ["//src/lib:engine"],
 )
-

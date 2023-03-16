@@ -37,3 +37,10 @@ git_repository(
     remote = "https://github.com/gflags/gflags.git",
     tag = "v2.2.2",
 )
+
+git_repository(
+    name = "glfw",
+    remote = "https://github.com/glfw/glfw.git",
+    commit = "7d5a16ce714f0b5f4efa3262de22e4d948851525",
+    build_file = "//third_party:glfw.BUILD",
+)
