@@ -1,11 +1,11 @@
-#ifndef _MMGOBJ_H
-#define _MMGOBj_H
+#ifndef MAJKT_MMGOBJ_H_
+#define MAJKT_MMGOBJ_H_
 
 #include <string>
 #include "MmgVector2.H"
 #include "MmgColor.H"
-using std::string;
 
+namespace majkt {
 
 class MmgObj
 {
@@ -77,6 +77,6 @@ std::string GetName(); //
 };
 
 
+} // namespace majkt
 
-
-#endif; // _MMGObj_H
+#endif; // MAJKT_MMGOBJ_H_

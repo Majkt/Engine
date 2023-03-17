@@ -11,14 +11,16 @@
  * @copyright Copyright (c) 2023
  * 
  */
-#ifndef _MMGRECT_H
-#define _MMGRECT_H
+#ifndef MAJKT_MMGRECT_H_
+#define MAJKT_MMGRECT_H_
 
 // May need to include more stuff here 
 #include <string>
 
-
-class MmgRect {
+namespace majkt {
+    
+class MmgRect
+{
     public:
     // static class members 
     static MmgRect GetUnitRect(); // returns a MmgRect instance positioned at (0, 0, 0) with a size of 1,1
@@ -55,8 +57,8 @@ class MmgRect {
     int top; // the top coordinate of the rectangle
     int bottom; // the bottom coordinate of the rectangle
     int right; // the right coordinate of the rectangle
-
-
-
 };
-#endif // _MMGRECT_H
+
+} // namespace majkt
+
+#endif // MAJKT_MMGRECT_H_

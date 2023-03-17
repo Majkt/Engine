@@ -10,11 +10,6 @@ namespace majkt {
 
 	static bool glfw_initialized_{false};
 
-	// std::unique_ptr<Window> Window::Create(const WindowProps& props)
-	// {
-	// 	return std::make_unique<WindowsWindow>(props);
-	// }
-
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
 		Init(props);

@@ -10,8 +10,11 @@
  * 
  */
 
-#ifndef _MMGCOLOR_H
-#define _MMGCOLOR_H
+#ifndef MAJKT_MMGCOLOR_H_
+#define MAJKT_MMGCOLOR_H_
+
+namespace majkt {
+
 
 /**
  * @brief SFML is a free, open-source software dev kit for multimedia applications.
@@ -23,9 +26,8 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
-
-
-class MmgColor {
+class MmgColor 
+{
     public:
 
     // examples of Static class methods for quick access to colors from the textbook
@@ -58,4 +60,6 @@ class MmgColor {
         
 };
 
-#endif // _MMGCOLOR_H
+} // namespace majkt
+
+#endif // MAJKT_MMGCOLOR_H_
