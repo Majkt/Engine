@@ -1,8 +1,0 @@
-/nologo
-/OUT:bazel-out/x64_windows-fastbuild/bin/example.exe
-bazel-out/x64_windows-fastbuild/bin/_objs/example/main.obj
-/SUBSYSTEM:CONSOLE
-/MACHINE:X64
-/DEFAULTLIB:msvcrt.lib
-/DEBUG:FASTLINK
-/INCREMENTAL:NO
