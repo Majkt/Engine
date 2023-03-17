@@ -1,0 +1,15 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "windows",
+    srcs = glob(["*.cc"]),
+    hdrs = glob(["*.h"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@glog",
+        "@com_github_gflags_gflags//:gflags",
+        "//src/lib/core:core",
+        "@glfw//:glfw",
+    ],
+)
+
