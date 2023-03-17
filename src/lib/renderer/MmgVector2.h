@@ -1,7 +1,9 @@
-#ifndef _MMGVECTOR2_H
-#define _MMGVECTOR2_H
+#ifndef MAJKT_MMGVECTOR2_H_
+#define MAJKT_MMGVECTOR2_H_
 
 #include <array>
+
+namespace majkt {
 
 class MmgVector2
 {
@@ -44,4 +46,6 @@ class MmgVector2
 
 };
 
-#endif
+} // namespace majkt
+
+#endif // MAJKT_MMGVECTOR2_H_
