@@ -11,6 +11,7 @@ cc_library(
         "//src/lib/core:core",
         "//src/lib/events:events",
         "//src/lib/core:window",
+        "@com_google_absl//absl/functional:bind_front",
         "@glfw//:glfw",
     ],
 )

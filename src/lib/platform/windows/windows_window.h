@@ -25,6 +25,7 @@ namespace majkt {
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 	private:
+		// Used in constructor for initializations
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 	private:

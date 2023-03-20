@@ -33,7 +33,7 @@ class MAJKT_BASE_EXPORT KeyPressedEvent : public KeyEvent
             return ss.str();
         }
 
-        EVENT_CLASS_TYPE(EventType::kKeyPressed)
+        EVENT_CLASS_TYPE(kKeyPressed)
     private:
         int repeat_count_;
 };
@@ -51,7 +51,7 @@ class MAJKT_BASE_EXPORT KeyReleasedEvent : public KeyEvent
             return ss.str();
         }
 
-        EVENT_CLASS_TYPE(EventType::kKeyReleased)
+        EVENT_CLASS_TYPE(kKeyReleased)
 };
 
 } // namespace majkt

@@ -9,6 +9,7 @@ cc_library(
         "@glog",
         "@com_github_gflags_gflags//:gflags",
         "//src/lib/core:core",
+        "//src/lib/events:events",
         "@glfw//:glfw",
     ],
 )
