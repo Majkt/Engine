@@ -24,7 +24,7 @@ namespace majkt {
  * link: https://www.sfml-dev.org/
  */
 #include <string>
-#include <SFML/Graphics.hpp>
+#include "SFML\src\include\SFML\Graphics.hpp"
 
 class MmgColor 
 {
