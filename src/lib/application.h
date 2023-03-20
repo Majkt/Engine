@@ -4,6 +4,7 @@
 #include "src/lib/core/base_export.h"
 #include "src/lib/events/event.h"
 #include "src/lib/core/window.h"
+#include "src/lib/events/application_events.h"
 
 #include <memory>
 
@@ -16,7 +17,10 @@ namespace majkt
 		virtual ~Application();
 
 		void Run();
+		void OnEvent(Event& e);
 	private:
+		bool OnWindowClose(WindowCloseEvent& e);
+
 		std::unique_ptr<Window> window_;
 		bool running_{true};
     };

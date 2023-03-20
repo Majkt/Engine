@@ -6,18 +6,29 @@
 #include "glog/stl_logging.h"
 #include <iostream>
 
+#include "absl/functional/bind_front.h"
 #include <GLFW/glfw3.h>
 
 namespace majkt
 {
+    
     Application::Application()
     {
         window_ = std::unique_ptr<Window>(Window::Create());
+        window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));
     }
 
     Application::~Application()
     {
     }
+
+	void Application::OnEvent(Event& e)
+	{
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowCloseEvent>(absl::bind_front(&Application::OnWindowClose, this));
+
+		LOG(INFO) << e;
+	}
 
     void Application::Run()
     {
@@ -27,5 +38,11 @@ namespace majkt
 			window_->OnUpdate();
         }
     }
+
+	bool Application::OnWindowClose(WindowCloseEvent& e)
+	{
+		running_ = false;
+		return true;
+	}
 
 } // namespace Majkt

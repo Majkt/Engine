@@ -9,7 +9,6 @@
 
 namespace majkt {
 
-// Enum defined to filter events based on category.
 enum class EventType
 {
     kNone = 0,
