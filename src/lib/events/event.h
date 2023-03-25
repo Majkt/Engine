@@ -49,9 +49,8 @@ class MAJKT_BASE_EXPORT Event
         {
             return GetCategoryFlags() & category;
         }
-    protected:
         // Check if the event has been handled.
-        bool event_handled_ = false;
+        bool handled_ = false;
 };
 
 class EventDispatcher
@@ -67,7 +66,7 @@ class EventDispatcher
         {
             if (event_.GetEventType() == T::GetStaticType())
             {
-                event_.event_handled_ = func(*(T*)&event_);
+                event_.handled_ = func(*(T*)&event_);
                 return true;
             }
             return false;

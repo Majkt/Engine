@@ -2,8 +2,10 @@
 #define MAJKT_ENGINE_APLICATION_H_
 
 #include "src/lib/core/base_export.h"
-#include "src/lib/events/event.h"
+
 #include "src/lib/core/window.h"
+#include "src/lib/layer_stack.h"
+#include "src/lib/events/event.h"
 #include "src/lib/events/application_events.h"
 
 #include <memory>
@@ -18,16 +20,21 @@ namespace majkt
 
 		void Run();
 		void OnEvent(Event& e);
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* layer);
+
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> window_;
 		bool running_{true};
+
+		LayerStack layer_stack_;
     };
 
 	// To be defined in CLIENT
 	Application* CreateApplication();
 
-} // namespace Majkt
+} // namespace majkt
 
 #endif  // MAJKT_ENGINE_APLICATION_H_
