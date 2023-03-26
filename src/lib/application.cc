@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "absl/functional/bind_front.h"
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 namespace majkt
 {
