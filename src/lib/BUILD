@@ -14,5 +14,6 @@ cc_library(
         "@com_google_absl//absl/functional:bind_front",
         "@glfw//:glfw",
         "//third_party/glad",
+        "//third_party/imgui",
     ],
 )
