@@ -11,5 +11,6 @@ cc_library(
         "//src/lib/core:core",
         "//src/lib/events:events",
         "@glfw//:glfw",
+        "//third_party/glad",
     ],
 )

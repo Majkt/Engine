@@ -7,7 +7,7 @@
 #include "glog/stl_logging.h"
 #include <iostream>
 
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 namespace majkt {
 
@@ -49,6 +49,8 @@ namespace majkt {
 
 		window_ = glfwCreateWindow((int)props.width_, (int)props.height_, data_.title_.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(window_);
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		LOG(ERROR) << status << " Failed to initialize Glad!";
 		glfwSetWindowUserPointer(window_, &data_);
 		SetVSync(true);
 
