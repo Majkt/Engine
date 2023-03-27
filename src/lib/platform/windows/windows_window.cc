@@ -7,7 +7,7 @@
 #include "glog/stl_logging.h"
 #include <iostream>
 
-#include <glad/glad.h>
+#include "imgui.h"
 
 namespace majkt {
 
@@ -47,10 +47,13 @@ namespace majkt {
 			glfw_initialized_ = true;
 		}
 
+		// GL 3.0 + GLSL 130
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
 		window_ = glfwCreateWindow((int)props.width_, (int)props.height_, data_.title_.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(window_);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		LOG(ERROR) << status << " Failed to initialize Glad!";
+		gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		glfwSetWindowUserPointer(window_, &data_);
 		SetVSync(true);
 
@@ -99,6 +102,14 @@ namespace majkt {
 			}
 		});
 
+		glfwSetCharCallback(window_, [](GLFWwindow* window, unsigned int keycode)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			KeyTypedEvent event(keycode);
+			data.event_callback_(event);
+		});
+
 		glfwSetMouseButtonCallback(window_, [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
@@ -140,6 +151,7 @@ namespace majkt {
 	void WindowsWindow::Shutdown()
 	{
 		glfwDestroyWindow(window_);
+		glfwTerminate();
 	}
 
 	void WindowsWindow::OnUpdate()

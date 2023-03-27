@@ -2,9 +2,8 @@
 #define MAJKT_ENGINE_APLICATION_H_
 
 #include "src/lib/core/base_export.h"
-
+#include "src/lib/core/layer_stack.h"
 #include "src/lib/core/window.h"
-#include "src/lib/layer_stack.h"
 #include "src/lib/events/event.h"
 #include "src/lib/events/application_events.h"
 
@@ -22,6 +21,8 @@ namespace majkt
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
+		inline Window& GetWindow() { return *window_; }
+		inline static Application& Get() { return *instance_; }
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
@@ -30,6 +31,8 @@ namespace majkt
 		bool running_{true};
 
 		LayerStack layer_stack_;
+	private:
+		static Application* instance_;
     };
 
 	// To be defined in CLIENT

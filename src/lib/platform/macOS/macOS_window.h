@@ -3,6 +3,7 @@
 
 #include "src/lib/core/window.h"
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <string>
@@ -24,6 +25,8 @@ namespace majkt {
 		inline void SetEventCallback(const EventCallbackFn& callback) override { data_.event_callback_ = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+
+		void* GetNativeWindow() const override { return window_; }
 	private:
 	  	// Used in constructor for initializations
 		virtual void Init(const WindowProps& props);

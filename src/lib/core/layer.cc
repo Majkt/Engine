@@ -1,4 +1,4 @@
-#include "src/lib/layer.h"
+#include "src/lib/core/layer.h"
 #include <string>
 
 namespace majkt {

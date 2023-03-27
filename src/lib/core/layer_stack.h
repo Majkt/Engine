@@ -2,7 +2,7 @@
 #define MAJKT_ENGINE_LAYER_STACK_H_
 
 #include "src/lib/core/base_export.h"
-#include "src/lib/layer.h"
+#include "src/lib/core/layer.h"
 #include <vector>
 
 namespace majkt 

@@ -2,8 +2,9 @@
 #define MAJKT_ENGINE_H_
 
 // For use by Majkt applications
-#include "src/lib/application.h"
-#include "src/lib/layer.h"
+#include "src/lib/core/application.h"
+#include "src/lib/core/layer.h"
+#include "src/lib/imgui/imgui_layer.h"
 
 #include <glog/logging.h>
 #include "glog/stl_logging.h"

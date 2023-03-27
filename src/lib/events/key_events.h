@@ -54,6 +54,21 @@ class MAJKT_BASE_EXPORT KeyReleasedEvent : public KeyEvent
         EVENT_CLASS_TYPE(kKeyReleased)
 };
 
+class MAJKT_BASE_EXPORT KeyTypedEvent : public KeyEvent
+{
+public:
+    KeyTypedEvent(int keycode)
+        : KeyEvent(keycode) {}
+
+    std::string ToString() const override
+    {
+        std::stringstream ss;
+        ss << "KeyTypedEvent: " << key_code_;
+        return ss.str();
+    }
+
+    EVENT_CLASS_TYPE(KeyTyped)
+};
 } // namespace majkt
 
 #endif  // MAJKT_KEY_EVENTS_H_
