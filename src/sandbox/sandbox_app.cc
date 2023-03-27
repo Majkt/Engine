@@ -15,7 +15,7 @@ public:
 
 	void OnEvent(majkt::Event& event) override
 	{
-		LOG(INFO) << event;
+		// LOG(INFO) << event;
 	}
 
 };
@@ -26,6 +26,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
+		PushOverlay(new majkt::ImGuiLayer());
 	}
 
 	~Sandbox()

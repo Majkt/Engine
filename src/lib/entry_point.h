@@ -3,6 +3,8 @@
 #ifndef MAJKT_ENGINE_PLATFORM
 #define MAJKT_ENGINE_PLATFORM
 
+#include "src/lib/core/application.h"
+
 #include <glog/logging.h>
 #include "glog/stl_logging.h"
 

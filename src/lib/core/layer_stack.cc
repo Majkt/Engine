@@ -1,4 +1,4 @@
-#include "src/lib/layer_stack.h"
+#include "src/lib/core/layer_stack.h"
 
 namespace majkt {
 
@@ -9,8 +9,11 @@ namespace majkt {
 
 	LayerStack::~LayerStack()
 	{
-		for (Layer* layer : layers_)
+		for (Layer* layer : layers_) 
+		{
+			layer->OnDetach();
 			delete layer;
+		}
 	}
 
 	void LayerStack::PushLayer(Layer* layer)

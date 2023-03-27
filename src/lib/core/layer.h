@@ -10,7 +10,7 @@ namespace majkt
 	class MAJKT_BASE_EXPORT Layer
 	{
 	public:
-		Layer(const std::string& name = "Layer");
+		Layer(const std::string& debugName = "Layer");
 		virtual ~Layer();
 
 		virtual void OnAttach() {}

@@ -7,7 +7,7 @@
 #include "glog/stl_logging.h"
 #include <iostream>
 
-#include <glad/glad.h>
+#include "imgui.h"
 
 namespace majkt {
 
@@ -47,10 +47,15 @@ namespace majkt {
 			glfw_initialized_ = true;
 		}
 
+        // GL 3.2 + GLSL 150
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
+
 		window_ = glfwCreateWindow((int)props.width_, (int)props.height_, data_.title_.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(window_);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		LOG(ERROR) << status << " Failed to initialize Glad!";
+		gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		glfwSetWindowUserPointer(window_, &data_);
 		SetVSync(true);
 
@@ -60,7 +65,7 @@ namespace majkt {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.width_ = width;
 			data.height_ = height;
-
+ 
 			WindowResizeEvent event(width, height);
 			data.event_callback_(event);
 		});
@@ -97,6 +102,14 @@ namespace majkt {
 					break;
 				}
 			}
+		});
+
+		glfwSetCharCallback(window_, [](GLFWwindow* window, unsigned int keycode)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			KeyTypedEvent event(keycode);
+			data.event_callback_(event);
 		});
 
 		glfwSetMouseButtonCallback(window_, [](GLFWwindow* window, int button, int action, int mods)
@@ -140,6 +153,8 @@ namespace majkt {
 	void MacOSWindow::Shutdown()
 	{
 		glfwDestroyWindow(window_);
+	    glfwTerminate();
+
 	}
 
 	void MacOSWindow::OnUpdate()
