@@ -9,13 +9,16 @@ cc_library(
     ],
     hdrs = [
         "application.h",
-        "core.h",
         "base_export.h",
-        "math_util.h",
+        "core.h",
+        "input.h",
         "platform_detection.h",
         "window.h",
+        "key_codes.h",
+        "mouse_button_codes.h",
         "layer.h",
         "layer_stack.h",
+        "math_util.h",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -4,6 +4,7 @@
 #include "src/lib/core/base_export.h"
 #include "src/lib/core/layer_stack.h"
 #include "src/lib/core/window.h"
+#include "src/lib/core/input.h"
 #include "src/lib/events/event.h"
 #include "src/lib/events/application_events.h"
 

@@ -10,14 +10,20 @@ public:
 
 	void OnUpdate() override
 	{
-		// LOG(INFO) << "ExampleLayer::Update";
+		if (majkt::Input::IsKeyPressed(MAJKT_KEY_TAB))
+			LOG(INFO) << "Tab key is pressed (poll)!";
 	}
 
 	void OnEvent(majkt::Event& event) override
 	{
-		// LOG(INFO) << event;
+		if (event.GetEventType() == majkt::EventType::kKeyPressed)
+		{
+			majkt::KeyPressedEvent& e = (majkt::KeyPressedEvent&)event;
+			if (e.GetKeyCode() == MAJKT_KEY_TAB)
+				LOG(INFO) << "Tab key is pressed (event)!";
+			LOG(INFO) << (char)e.GetKeyCode();
+		}
 	}
-
 };
 
 class Sandbox : public majkt::Application
