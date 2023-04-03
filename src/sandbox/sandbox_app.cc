@@ -14,6 +14,13 @@ public:
 			LOG(INFO) << "Tab key is pressed (poll)!";
 	}
 
+	void OnImGuiRender() override
+	{
+		ImGui::Begin("Test");
+		ImGui::Text("Hello World");
+		ImGui::End();
+	}
+
 	void OnEvent(majkt::Event& event) override
 	{
 		if (event.GetEventType() == majkt::EventType::kKeyPressed)
@@ -32,7 +39,6 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushOverlay(new majkt::ImGuiLayer());
 	}
 
 	~Sandbox()

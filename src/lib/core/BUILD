@@ -6,11 +6,13 @@ cc_library(
         "application.cc",
         "layer.cc",
         "layer_stack.cc",
+        "imgui_layer.cc",
     ],
     hdrs = [
         "application.h",
         "base_export.h",
         "core.h",
+        "imgui_layer.h",
         "input.h",
         "platform_detection.h",
         "window.h",

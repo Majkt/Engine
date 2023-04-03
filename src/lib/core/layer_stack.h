@@ -22,7 +22,7 @@ namespace majkt
 		std::vector<Layer*>::iterator end() { return layers_.end(); }
 	private:
 		std::vector<Layer*> layers_;
-		std::vector<Layer*>::iterator layer_insert_;
+		unsigned int layer_insert_index_{0};
 	};
 
 } // namespace majkt

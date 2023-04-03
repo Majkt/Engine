@@ -16,10 +16,12 @@ namespace majkt {
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void OnAttach();
-		void OnDetach();
-		void OnUpdate();
-		void OnEvent(Event& event);
+		void OnAttach() override;
+		void OnDetach() override;
+		void OnImGuiRender() override;
+
+		void Begin();
+		void End();
 	private:
 		float time_{0.0};
 		bool show_demo_window_{true};

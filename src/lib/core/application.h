@@ -8,6 +8,8 @@
 #include "src/lib/events/event.h"
 #include "src/lib/events/application_events.h"
 
+#include "src/lib/core/imgui_layer.h"
+
 #include <memory>
 
 namespace majkt 
@@ -29,6 +31,7 @@ namespace majkt
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> window_;
+		ImGuiLayer* imgui_layer_;
 		bool running_{true};
 
 		LayerStack layer_stack_;

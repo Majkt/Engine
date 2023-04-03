@@ -4,7 +4,7 @@
 // For use by Majkt applications
 #include "src/lib/core/application.h"
 #include "src/lib/core/layer.h"
-#include "src/lib/imgui/imgui_layer.h"
+#include "src/lib/core/imgui_layer.h"
 
 #include "src/lib/core/input.h"
 #include "src/lib/core/key_codes.h"
@@ -14,6 +14,7 @@
 #include "glog/stl_logging.h"
 #include <iostream>
 
+#include "imgui.h"
 
 // ------------Entry Point------------
 #include "src/lib/entry_point.h"

@@ -3,6 +3,9 @@
 #include "src/lib/core/window.h"
 #include "src/lib/core/layer.h"
 
+#include <glad/glad.h>
+#include "GLFW/glfw3.h"
+
 #include <glog/logging.h>
 #include "glog/stl_logging.h"
 #include <iostream>
@@ -21,6 +24,9 @@ namespace majkt
 		instance_ = this;
         window_ = std::unique_ptr<Window>(Window::Create());
         window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));
+
+		imgui_layer_ = new ImGuiLayer();
+		PushOverlay(imgui_layer_);
     }
 
     Application::~Application()
@@ -30,8 +36,17 @@ namespace majkt
     void Application::Run()
     {
         while (running_){
+			glClearColor(.3, .3, .7, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+			
 			for (Layer* layer : layer_stack_)
 				layer->OnUpdate();
+
+			imgui_layer_->Begin();
+			for (Layer* layer : layer_stack_)
+				layer->OnImGuiRender();
+			imgui_layer_->End();
+
 			window_->OnUpdate();
         }
     }
@@ -52,13 +67,11 @@ namespace majkt
 	void Application::PushLayer(Layer* layer)
 	{
 		layer_stack_.PushLayer(layer);
-		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
 		layer_stack_.PushOverlay(layer);
-		layer->OnAttach();
 	}
 
 
