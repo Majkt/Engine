@@ -3,8 +3,9 @@
 
 #include <string>
 #include "MmgVector2.H"
-#include "MmgColor.H"
-
+#include "MmgColor.h"
+//#include "MmgPen"
+using namespace std;
 namespace majkt {
 
 class MmgObj
@@ -16,8 +17,10 @@ public:
     int w;
     int h;
     bool isVisible;
+    string name;
+    string mmgUid;
     MmgColor color; // used to represent the color of this object
-    std::string GetVersion();  
+    string GetVersion();  
     bool GetIsVisible(); 
     void SetIsVisible(bool bl); 
 
@@ -39,10 +42,10 @@ public:
 
 
 //// GET AND SET METHODS used to interact with  the X and Y coordinate values directly
-std::string GetName(); //
- void SetName(std::string n);// 
- std::string GetId();// 
- void SetId(std::string i);
+string GetName(); //
+ void SetName(string n);// 
+ string GetId();// 
+ void SetId(string i);
 
     void SetX(int inX);
      int GetX() ;
@@ -53,9 +56,12 @@ std::string GetName(); //
  bool GetHasParent(); 
  void SetHasParent(bool b); 
  MmgObj GetParent(); 
- void SetParent(MmgObj o); 
+ void SetParent(MmgObj o);
+ bool parent;
+
 
     MmgObj(MmgVector2 v2, int W, int H, bool isv, MmgColor c, std::string n, std::string i); //sets class fields to an initial value using either a default or argument value.
+     MmgObj(); // defualt constuctor 
     MmgObj(MmgObj obj);  //takes an MmgObj instance as an argument. This is a specialized constructor that creates a new class instance based on the passed-in object. 
   
   // return a new MmgObj instance, the Clone method 
@@ -74,6 +80,12 @@ std::string GetName(); //
     bool MmgUpdate(int updateTick, long currentTimeMs, long msSinceLastFrame); 
     std::string ApiToString(); 
     bool ApiEquals(MmgObj obj);
+
+    private:
+
+
+
+
 };
 
 
