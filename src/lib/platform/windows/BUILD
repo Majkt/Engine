@@ -7,9 +7,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@glog",
-        "@com_github_gflags_gflags//:gflags",
         "//src/lib/core:core",
         "//src/lib/events:events",
+        "//src/lib/platform/opengl:opengl",
         "@glfw//:glfw",
         "//third_party/glad",
     ],

@@ -2,6 +2,7 @@
 #include "src/lib/events/application_events.h"
 #include "src/lib/events/mouse_events.h"
 #include "src/lib/events/key_events.h"
+#include "src/lib/platform/opengl/openGL_context.h"
 
 #include <glog/logging.h>
 #include "glog/stl_logging.h"
@@ -54,8 +55,10 @@ namespace majkt {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
 
 		window_ = glfwCreateWindow((int)props.width_, (int)props.height_, data_.title_.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(window_);
-		gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+		context_ = new OpenGLContext(window_);
+		context_->Init();
+		
 		glfwSetWindowUserPointer(window_, &data_);
 		SetVSync(true);
 
@@ -160,7 +163,7 @@ namespace majkt {
 	void MacOSWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(window_);
+		context_->SwapBuffers();
 	}
 
 	void MacOSWindow::SetVSync(bool enabled)

@@ -2,6 +2,7 @@
 #define MAJKT_PLATFORM_WINDOWS_WINDOW_H_
 
 #include "src/lib/core/window.h"
+#include "src/lib/renderer/graphics_context.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -33,6 +34,7 @@ namespace majkt {
 		virtual void Shutdown();
 	private:
 		GLFWwindow* window_;
+		GraphicsContext* context_;
 
 		struct WindowData
 		{
