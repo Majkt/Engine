@@ -8,8 +8,4 @@ namespace majkt {
 	{
 	}
 
-	Layer::~Layer()
-	{
-	}
-
 } // namespace majkt

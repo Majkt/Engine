@@ -72,10 +72,6 @@ namespace majkt
 		shader_.reset(new Shader(vertex_src, fragment_src));
 	}
 
-    Application::~Application()
-    {
-    }
-
     void Application::Run()
     {
         while (running_){

@@ -14,7 +14,7 @@ namespace majkt {
 	{
 	public:
 		ImGuiLayer();
-		~ImGuiLayer();
+		~ImGuiLayer() = default;
 
 		void OnAttach() override;
 		void OnDetach() override;
