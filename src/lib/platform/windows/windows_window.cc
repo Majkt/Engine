@@ -2,7 +2,7 @@
 #include "src/lib/events/application_events.h"
 #include "src/lib/events/mouse_events.h"
 #include "src/lib/events/key_events.h"
-#include "src/lib/platform/opengl/openGL_context.h"
+#include "src/lib/platform/opengl/opengl_context.h"
 
 #include <glog/logging.h>
 #include "glog/stl_logging.h"

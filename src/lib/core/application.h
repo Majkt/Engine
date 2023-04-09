@@ -8,6 +8,7 @@
 #include "src/lib/events/event.h"
 #include "src/lib/events/application_events.h"
 #include "src/lib/renderer/shader.h"
+#include "src/lib/renderer/buffer.h"
 
 #include "src/lib/core/imgui_layer.h"
 
@@ -34,9 +35,11 @@ namespace majkt
 		std::unique_ptr<Window> window_;
 		ImGuiLayer* imgui_layer_;
 		bool running_{true};
-
 		LayerStack layer_stack_;
-		unsigned int vertex_array_, vertex_buffer_, index_buffer_;
+
+		unsigned int vertex_array_;
+		std::unique_ptr<VertexBuffer> vertex_buffer_;
+		std::unique_ptr<IndexBuffer> index_buffer_;
 		std::unique_ptr<Shader> shader_;
 	private:
 		static Application* instance_;
