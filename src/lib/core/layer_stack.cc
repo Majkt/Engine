@@ -30,7 +30,7 @@ namespace majkt {
 
 	void LayerStack::PopLayer(Layer* layer)
 	{
-		auto it = std::find(layers_.begin(), layers_.end(), layer);
+		auto it = std::find(layers_.begin(), layers_.begin() + layer_insert_index_, layer);
 		if (it != layers_.end())
 		{
 			layers_.erase(it);
@@ -41,7 +41,7 @@ namespace majkt {
 
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
-		auto it = std::find(layers_.begin(), layers_.end(), overlay);
+		auto it = std::find(layers_.begin() + layer_insert_index_, layers_.end(), overlay);
 		if (it != layers_.end())
 		{
 			layers_.erase(it);

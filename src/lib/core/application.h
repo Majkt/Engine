@@ -9,6 +9,7 @@
 #include "src/lib/events/application_events.h"
 #include "src/lib/renderer/shader.h"
 #include "src/lib/renderer/buffer.h"
+#include "src/lib/renderer/vertex_array.h"
 
 #include "src/lib/core/imgui_layer.h"
 
@@ -37,10 +38,12 @@ namespace majkt
 		bool running_{true};
 		LayerStack layer_stack_;
 
-		unsigned int vertex_array_;
-		std::unique_ptr<VertexBuffer> vertex_buffer_;
-		std::unique_ptr<IndexBuffer> index_buffer_;
-		std::unique_ptr<Shader> shader_;
+		std::shared_ptr<Shader> shader_;
+		std::shared_ptr<VertexArray> vertex_array_;
+
+		std::shared_ptr<Shader> blue_shader_;
+		std::shared_ptr<VertexArray> square_va_;
+
 	private:
 		static Application* instance_;
     };
