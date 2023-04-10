@@ -4,8 +4,9 @@
 #include "src/lib/core/layer.h"
 #include "src/lib/renderer/shader.h"
 
-#include <glad/glad.h>
-#include "GLFW/glfw3.h"
+// #include <glad/glad.h>
+// #include "GLFW/glfw3.h"
+#include "src/lib/renderer/renderer.h"
 
 #include <glog/logging.h>
 #include "glog/stl_logging.h"
@@ -132,17 +133,18 @@ namespace majkt
     void Application::Run()
     {
         while (running_){
-			// glClearColor(.3, .3, .7, 1);
-			glClearColor(0.1f, 0.1f, 0.1f, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+			RenderCommand::Clear();
+
+			Renderer::BeginScene();
 
 			blue_shader_->Bind();
-			square_va_->Bind();
-			glDrawElements(GL_TRIANGLES, square_va_->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-			
-			shader_->Bind();	
-			vertex_array_->Bind();
-			glDrawElements(GL_TRIANGLES, vertex_array_->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+			Renderer::Submit(square_va_);
+
+			shader_->Bind();
+			Renderer::Submit(vertex_array_);
+
+			Renderer::EndScene();
 
 			for (Layer* layer : layer_stack_)
 				layer->OnUpdate();

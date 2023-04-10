@@ -1,21 +1,21 @@
-#ifndef MAJKT_PLATFORM_RENDERER_API_H_
-#define MAJKT_PLATFORM_RENDERER_API_H_
+#ifndef MAJKT_PLATFORM_RENDERER_H_
+#define MAJKT_PLATFORM_RENDERER_H_
+
+#include "src/lib/renderer/render_command.h"
 
 namespace majkt {
-
-	enum class RendererAPI
-	{
-		None = 0, OpenGL = 1
-	};
 
 	class Renderer
 	{
         public:
-            inline static RendererAPI GetAPI() { return renderer_api_; }
-        private:
-            static RendererAPI renderer_api_;
+			static void BeginScene();
+			static void EndScene();
+
+			static void Submit(const std::shared_ptr<VertexArray>& vertexArray);
+
+			inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	};
 
 } // namespace majkt
 
-#endif  // MAJKT_PLATFORM_RENDERER_API_H_
+#endif  // MAJKT_PLATFORM_RENDERER_H_

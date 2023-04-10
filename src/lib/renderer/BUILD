@@ -9,5 +9,6 @@ cc_library(
         "@glog",
         "@glfw//:glfw",
         "//third_party/glad",
+        "//third_party/glm",
     ]
 )
