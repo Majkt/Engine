@@ -26,9 +26,6 @@ public:
 		if (event.GetEventType() == majkt::EventType::kKeyPressed)
 		{
 			majkt::KeyPressedEvent& e = (majkt::KeyPressedEvent&)event;
-			if (e.GetKeyCode() == MAJKT_KEY_TAB)
-				LOG(INFO) << "Tab key is pressed (event)!";
-			LOG(INFO) << (char)e.GetKeyCode();
 		}
 	}
 };

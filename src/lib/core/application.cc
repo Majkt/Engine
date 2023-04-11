@@ -3,9 +3,6 @@
 #include "src/lib/core/window.h"
 #include "src/lib/core/layer.h"
 #include "src/lib/renderer/shader.h"
-
-// #include <glad/glad.h>
-// #include "GLFW/glfw3.h"
 #include "src/lib/renderer/renderer.h"
 
 #include <glog/logging.h>
@@ -18,7 +15,7 @@ namespace majkt
 {
 	Application* Application::instance_ = nullptr;
 
-    Application::Application()
+    Application::Application() : camera_(-1.6f, 1.6f, -0.9f, 0.9f)
     {
 		if (instance_){
 			LOG(WARNING) << instance_ <<  " Application already exists!";
@@ -79,13 +76,16 @@ namespace majkt
 			
 			layout(location = 0) in vec3 array_position_;
 			layout(location = 1) in vec4 array_color_;
+
+			uniform mat4 view_projection_;
+			
 			out vec3 vertex_position_;
 			out vec4 vertex_color_;
 			void main()
 			{
 				vertex_position_ = array_position_;
 				vertex_color_ = array_color_;
-				gl_Position = vec4(array_position_, 1.0);	
+				gl_Position = view_projection_ * vec4(array_position_, 1.0);	
 			}
 		)";
 
@@ -108,11 +108,12 @@ namespace majkt
 			#version 410 core
 			
 			layout(location = 0) in vec3 array_position_;
+			uniform mat4 view_projection_;
 			out vec3 vertex_position_;
 			void main()
 			{
 				vertex_position_ = array_position_;
-				gl_Position = vec4(array_position_, 1.0);	
+				gl_Position = view_projection_ * vec4(array_position_, 1.0);	
 			}
 		)";
 
@@ -136,14 +137,12 @@ namespace majkt
 			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 			RenderCommand::Clear();
 
-			Renderer::BeginScene();
+			camera_.SetPosition({ 0.5f, 0.5f, 0.0f });
+			camera_.SetRotation(45.0f);
 
-			blue_shader_->Bind();
-			Renderer::Submit(square_va_);
-
-			shader_->Bind();
-			Renderer::Submit(vertex_array_);
-
+			Renderer::BeginScene(camera_);
+			Renderer::Submit(blue_shader_, square_va_);
+			Renderer::Submit(shader_, vertex_array_);
 			Renderer::EndScene();
 
 			for (Layer* layer : layer_stack_)

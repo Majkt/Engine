@@ -4,14 +4,15 @@
 #include "src/lib/core/base_export.h"
 #include "src/lib/core/layer_stack.h"
 #include "src/lib/core/window.h"
+#include "src/lib/core/imgui_layer.h"
 #include "src/lib/core/input.h"
 #include "src/lib/events/event.h"
 #include "src/lib/events/application_events.h"
 #include "src/lib/renderer/shader.h"
 #include "src/lib/renderer/buffer.h"
 #include "src/lib/renderer/vertex_array.h"
+#include "src/lib/renderer/orthographic_camera.h"
 
-#include "src/lib/core/imgui_layer.h"
 
 #include <memory>
 
@@ -44,6 +45,7 @@ namespace majkt
 		std::shared_ptr<Shader> blue_shader_;
 		std::shared_ptr<VertexArray> square_va_;
 
+		OrthographicCamera camera_;
 	private:
 		static Application* instance_;
     };
