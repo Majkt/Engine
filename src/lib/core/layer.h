@@ -2,7 +2,9 @@
 #define MAJKT_ENGINE_LAYER_H_
 
 #include "src/lib/core/base_export.h"
+#include "src/lib/core/timestep.h"
 #include "src/lib/events/event.h"
+
 #include <string>
 
 namespace majkt 
@@ -15,7 +17,7 @@ namespace majkt
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep timestep) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 

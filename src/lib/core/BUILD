@@ -19,6 +19,7 @@ cc_library(
         "layer_stack.h",
         "math_util.h",
         "mouse_button_codes.h",
+        "timestep.h",
         "platform_detection.h",
         "window.h",
     ],

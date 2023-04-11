@@ -4,21 +4,14 @@
 #include "src/lib/core/base_export.h"
 #include "src/lib/core/layer_stack.h"
 #include "src/lib/core/window.h"
+#include "src/lib/core/timestep.h"
 #include "src/lib/core/imgui_layer.h"
-#include "src/lib/core/input.h"
-#include "src/lib/events/event.h"
-#include "src/lib/events/application_events.h"
-#include "src/lib/renderer/shader.h"
-#include "src/lib/renderer/buffer.h"
-#include "src/lib/renderer/vertex_array.h"
-#include "src/lib/renderer/orthographic_camera.h"
-
 
 #include <memory>
 
 namespace majkt 
 {
-	class MAJKT_BASE_EXPORT Application
+	class Application
 	{
 	public:
 		Application();
@@ -38,14 +31,8 @@ namespace majkt
 		ImGuiLayer* imgui_layer_;
 		bool running_{true};
 		LayerStack layer_stack_;
-
-		std::shared_ptr<Shader> shader_;
-		std::shared_ptr<VertexArray> vertex_array_;
-
-		std::shared_ptr<Shader> blue_shader_;
-		std::shared_ptr<VertexArray> square_va_;
-
-		OrthographicCamera camera_;
+		float last_frame_time_{0.0f};
+		
 	private:
 		static Application* instance_;
     };
