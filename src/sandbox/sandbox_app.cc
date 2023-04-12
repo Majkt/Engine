@@ -1,4 +1,5 @@
 #include "src/lib/majkt_export.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 class ExampleLayer : public majkt::Layer
 {
@@ -31,12 +32,12 @@ public:
 		square_va_.reset(majkt::VertexArray::Create());
 
 		float squareVertices[3 * 4] = {
-			-0.75f, -0.75f, 0.0f,
-			 0.75f, -0.75f, 0.0f,
-			 0.75f,  0.75f, 0.0f,
-			-0.75f,  0.75f, 0.0f
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f
 		};
-
+		
 		std::shared_ptr<majkt::VertexBuffer> squareVB;
 		squareVB.reset(majkt::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 		squareVB->SetLayout({
@@ -56,14 +57,15 @@ public:
 			layout(location = 1) in vec4 array_color_;
 
 			uniform mat4 view_projection_;
-			
+			uniform mat4 transform_;
+
 			out vec3 vertex_position_;
 			out vec4 vertex_color_;
 			void main()
 			{
 				vertex_position_ = array_position_;
 				vertex_color_ = array_color_;
-				gl_Position = view_projection_ * vec4(array_position_, 1.0);	
+				gl_Position = view_projection_ * transform_ * vec4(array_position_, 1.0);	
 			}
 		)";
 
@@ -87,11 +89,13 @@ public:
 			
 			layout(location = 0) in vec3 array_position_;
 			uniform mat4 view_projection_;
+			uniform mat4 transform_;
+
 			out vec3 vertex_position_;
 			void main()
 			{
 				vertex_position_ = array_position_;
-				gl_Position = view_projection_ * vec4(array_position_, 1.0);	
+				gl_Position = view_projection_ * transform_ * vec4(array_position_, 1.0);	
 			}
 		)";
 
@@ -133,7 +137,17 @@ public:
 
 		majkt::Renderer::BeginScene(camera_);
 
-		majkt::Renderer::Submit(blue_shader_, square_va_);
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		for (int y = 0; y < 20; y++)
+		{
+			for (int x = 0; x < 20; x++)
+			{
+				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+				majkt::Renderer::Submit(blue_shader_, square_va_, transform);
+			}
+		}
 		majkt::Renderer::Submit(shader_, vertex_array_);
 
 		majkt::Renderer::EndScene();
