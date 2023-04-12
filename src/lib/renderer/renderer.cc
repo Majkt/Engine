@@ -1,5 +1,5 @@
 #include "src/lib/renderer/renderer.h"
-
+#include "src/lib/renderer/opengl_shader.h"
 namespace majkt {
 
 	Renderer::SceneData* Renderer::scene_data_ = new Renderer::SceneData;
@@ -12,12 +12,12 @@ namespace majkt {
 	void Renderer::EndScene()
 	{
 	}
-	
+
 	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transform)
 	{
 		shader->Bind();
-		shader->UploadUniformMat4("view_projection_", scene_data_->ViewProjectionMatrix);
-		shader->UploadUniformMat4("transform_", transform);
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("view_projection_", scene_data_->ViewProjectionMatrix);
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("transform_", transform);
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
 	}

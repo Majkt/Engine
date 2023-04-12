@@ -1,5 +1,7 @@
 #include "src/lib/majkt_export.h"
+#include "src/lib/renderer/opengl_shader.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class ExampleLayer : public majkt::Layer
 {
@@ -82,9 +84,9 @@ public:
 			}
 		)";
 
-		shader_.reset(new majkt::Shader(vertex_src, fragment_src));
+		shader_.reset(majkt::Shader::Create(vertex_src, fragment_src));
 
-		std::string blue_shader_vertex_src_ = R"(
+		std::string flat_color_shader_vertex_src = R"(
 			#version 410 core
 			
 			layout(location = 0) in vec3 array_position_;
@@ -99,18 +101,19 @@ public:
 			}
 		)";
 
-		std::string blue_shader_fragment_src_ = R"(
+		std::string flat_color_shader_fragment_src = R"(
 			#version 410 core
 			
 			layout(location = 0) out vec4 color;
 			in vec3 vertex_position_;
+				uniform vec3 color_;
 			void main()
 			{
-				color = vec4(0.2, 0.3, 0.8, 1.0);
+				color = vec4(color_, 1.0);
 			}
 		)";
 
-		blue_shader_.reset(new majkt::Shader(blue_shader_vertex_src_, blue_shader_fragment_src_));
+		flat_color_shader_.reset(majkt::Shader::Create(flat_color_shader_vertex_src, flat_color_shader_fragment_src));
 	}
 	void OnUpdate(majkt::Timestep timestep) override
 	{
@@ -139,15 +142,19 @@ public:
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
+		std::dynamic_pointer_cast<majkt::OpenGLShader>(flat_color_shader_)->Bind();
+		std::dynamic_pointer_cast<majkt::OpenGLShader>(flat_color_shader_)->UploadUniformFloat3("color_", square_color_);
+		
 		for (int y = 0; y < 20; y++)
 		{
 			for (int x = 0; x < 20; x++)
 			{
 				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-				majkt::Renderer::Submit(blue_shader_, square_va_, transform);
+				majkt::Renderer::Submit(flat_color_shader_, square_va_, transform);
 			}
 		}
+		
 		majkt::Renderer::Submit(shader_, vertex_array_);
 
 		majkt::Renderer::EndScene();
@@ -155,6 +162,9 @@ public:
 
 	void OnImGuiRender() override
 	{
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit3("Square Color", glm::value_ptr(square_color_));
+		ImGui::End();
 	}
 
 	void OnEvent(majkt::Event& event) override
@@ -164,7 +174,7 @@ private:
 	std::shared_ptr<majkt::Shader> shader_;
 	std::shared_ptr<majkt::VertexArray> vertex_array_;
 
-	std::shared_ptr<majkt::Shader> blue_shader_;
+	std::shared_ptr<majkt::Shader> flat_color_shader_;
 	std::shared_ptr<majkt::VertexArray> square_va_;
 
 	majkt::OrthographicCamera camera_;
@@ -172,6 +182,8 @@ private:
 	float camera_move_speed_{5.0f};
 	float camera_rotation_{0.0f};
 	float camera_rotation_speed_{180.0f};
+
+	glm::vec3 square_color_ = { 0.2f, 0.3f, 0.8f };
 };
 
 class Sandbox : public majkt::Application
