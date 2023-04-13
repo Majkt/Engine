@@ -7,6 +7,7 @@ cc_library(
         "layer.cc",
         "layer_stack.cc",
         "imgui_layer.cc",
+        "orthographic_camera_controller.cc",
     ],
     hdrs = [
         "application.h",
@@ -21,6 +22,7 @@ cc_library(
         "mouse_button_codes.h",
         "timestep.h",
         "platform_detection.h",
+        "orthographic_camera_controller.h",
         "window.h",
     ],
     visibility = ["//visibility:public"],

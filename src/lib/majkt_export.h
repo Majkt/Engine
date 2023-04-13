@@ -24,6 +24,7 @@ std::string get_current_dir() {
 #include "src/lib/core/input.h"
 #include "src/lib/core/key_codes.h"
 #include "src/lib/core/mouse_button_codes.h"
+#include "src/lib/core/orthographic_camera_controller.h"
 
 #include <glog/logging.h>
 #include "glog/stl_logging.h"

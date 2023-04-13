@@ -4,7 +4,6 @@
 #include "src/lib/core/base_export.h"
 #include "src/lib/core/layer_stack.h"
 #include "src/lib/core/window.h"
-#include "src/lib/core/timestep.h"
 #include "src/lib/core/imgui_layer.h"
 
 #include <memory>

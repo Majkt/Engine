@@ -7,7 +7,7 @@ class ExampleLayer : public majkt::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), camera_(-1.6f, 1.6f, -0.9f, 0.9f), camerposition__(0.0f)
+		: Layer("Example"), camera_controller_(1280.0f / 720.0f)
 	{
 		vertex_array_.reset(majkt::VertexArray::Create());
 
@@ -127,28 +127,12 @@ public:
 	
 	void OnUpdate(majkt::Timestep timestep) override
 	{
-		if (majkt::Input::IsKeyPressed(MAJKT_KEY_LEFT))
-			camerposition__.x -= camera_move_speed_ * timestep;
-		else if (majkt::Input::IsKeyPressed(MAJKT_KEY_RIGHT))
-			camerposition__.x += camera_move_speed_ * timestep;
-
-		if (majkt::Input::IsKeyPressed(MAJKT_KEY_UP))
-			camerposition__.y += camera_move_speed_ * timestep;
-		else if (majkt::Input::IsKeyPressed(MAJKT_KEY_DOWN))
-			camerposition__.y -= camera_move_speed_ * timestep;
-
-		if (majkt::Input::IsKeyPressed(MAJKT_KEY_A))
-			camera_rotation_ += camera_rotation_speed_ * timestep;
-		if (majkt::Input::IsKeyPressed(MAJKT_KEY_D))
-			camera_rotation_ -= camera_rotation_speed_ * timestep;
+		camera_controller_.OnUpdate(timestep);
 
 		majkt::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		majkt::RenderCommand::Clear();
 
-		camera_.SetPosition(camerposition__);
-		camera_.SetRotation(camera_rotation_);
-
-		majkt::Renderer::BeginScene(camera_);
+		majkt::Renderer::BeginScene(camera_controller_.GetCamera());
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -186,8 +170,9 @@ public:
 		ImGui::End();
 	}
 
-	void OnEvent(majkt::Event& event) override
+	void OnEvent(majkt::Event& e) override
 	{
+		camera_controller_.OnEvent(e);
 	}
 private:
 	majkt::ShaderLibrary shader_library_;
@@ -198,12 +183,7 @@ private:
 	std::shared_ptr<majkt::VertexArray> square_va_;
 	std::shared_ptr<majkt::Texture2D> texture_, blended_texture_;
 
-	majkt::OrthographicCamera camera_;
-	glm::vec3 camerposition__;
-	float camera_move_speed_{5.0f};
-	float camera_rotation_{0.0f};
-	float camera_rotation_speed_{180.0f};
-
+	majkt::OrthographicCameraController camera_controller_;
 	glm::vec3 square_color_ = { 0.2f, 0.3f, 0.8f };
 };
 
