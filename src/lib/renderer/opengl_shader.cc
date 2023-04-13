@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -28,9 +29,14 @@ namespace majkt {
 		std::string source = ReadFile(filepath);
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
+
+		// Extract name from filepath
+		std::filesystem::path path{filepath};
+		name_ = path.stem().string(); // Returns the file's name stripped of the extension.
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+		: name_(name)	
 	{
 		std::unordered_map<unsigned int, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
@@ -87,7 +93,10 @@ namespace majkt {
 	void OpenGLShader::Compile(const std::unordered_map<unsigned int, std::string>& shaderSources)
 	{
 		GLuint program = glCreateProgram();
-		std::vector<unsigned int> glShaderIDs(shaderSources.size());
+		if(shaderSources.size() > 2) LOG(FATAL) << "We only support 2 shaders for now";
+		std::array<GLenum, 2> glShaderIDs;
+		int glShaderIDIndex{0};
+		
 		for (auto& kv : shaderSources)
 		{
 			unsigned int type = kv.first;
@@ -116,7 +125,7 @@ namespace majkt {
 			}
 
 			glAttachShader(program, shader);
-			glShaderIDs.push_back(shader);
+			glShaderIDs[glShaderIDIndex++] = shader;
 		}
 		
 		renderer_id_ = program;

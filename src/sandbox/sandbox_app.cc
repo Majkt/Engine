@@ -85,7 +85,7 @@ public:
 			}
 		)";
 
-		shader_.reset(majkt::Shader::Create(vertex_src, fragment_src));
+		shader_ = majkt::Shader::Create("vertex_position_color", vertex_src, fragment_src);
 
 		std::string flat_color_shader_vertex_src = R"(
 			#version 410 core
@@ -114,15 +114,15 @@ public:
 			}
 		)";
 
-		flat_color_shader_.reset(majkt::Shader::Create(flat_color_shader_vertex_src, flat_color_shader_fragment_src));
+		flat_color_shader_ = majkt::Shader::Create("flat_color", flat_color_shader_vertex_src, flat_color_shader_fragment_src);
 			
-		texture_shader_.reset(majkt::Shader::Create(get_current_dir() + "/src/sandbox/assets/shaders/Texture.glsl"));
+		auto texture_shader = shader_library_.Load(get_current_dir() + "/src/sandbox/assets/shaders/Texture.glsl");
 
 		texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/style.png");
 		blended_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/crown.png");
 		
-		std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader_)->Bind();
-		std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader_)->UploadUniformInt("texture_", 0);
+		std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader)->Bind();
+		std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader)->UploadUniformInt("texture_", 0);
 	}
 	
 	void OnUpdate(majkt::Timestep timestep) override
@@ -165,11 +165,13 @@ public:
 			}
 		}
 		
+		auto textureShader = shader_library_.Get("Texture");
+
 		texture_->Bind();
-		majkt::Renderer::Submit(texture_shader_, square_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		majkt::Renderer::Submit(textureShader, square_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 		
 		blended_texture_->Bind();
-		majkt::Renderer::Submit(texture_shader_, square_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		majkt::Renderer::Submit(textureShader, square_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		// Triangle
 		// majkt::Renderer::Submit(shader_, vertex_array_);
@@ -188,10 +190,11 @@ public:
 	{
 	}
 private:
+	majkt::ShaderLibrary shader_library_;
 	std::shared_ptr<majkt::Shader> shader_;
 	std::shared_ptr<majkt::VertexArray> vertex_array_;
 
-	std::shared_ptr<majkt::Shader> flat_color_shader_, texture_shader_;
+	std::shared_ptr<majkt::Shader> flat_color_shader_;
 	std::shared_ptr<majkt::VertexArray> square_va_;
 	std::shared_ptr<majkt::Texture2D> texture_, blended_texture_;
 
