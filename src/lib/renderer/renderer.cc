@@ -3,6 +3,11 @@
 namespace majkt {
 
 	Renderer::SceneData* Renderer::scene_data_ = new Renderer::SceneData;
+	
+	void Renderer::Init()
+	{
+		RenderCommand::Init();
+	}
 
 	void Renderer::BeginScene(OrthographicCamera& camera)
 	{

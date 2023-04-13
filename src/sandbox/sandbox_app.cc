@@ -146,7 +146,9 @@ public:
 
 		texture_shader_.reset(majkt::Shader::Create(texture_shader_vertex_src_, texture_shader_fragment_src_));
 
-		texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/arm_showroom_ddn.png");
+		texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/style.png");
+		blended_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/crown.png");
+		
 		std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader_)->Bind();
 		std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader_)->UploadUniformInt("texture_", 0);
 	}
@@ -193,6 +195,9 @@ public:
 		
 		texture_->Bind();
 		majkt::Renderer::Submit(texture_shader_, square_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		
+		blended_texture_->Bind();
+		majkt::Renderer::Submit(texture_shader_, square_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		// Triangle
 		// majkt::Renderer::Submit(shader_, vertex_array_);
@@ -216,7 +221,7 @@ private:
 
 	std::shared_ptr<majkt::Shader> flat_color_shader_, texture_shader_;
 	std::shared_ptr<majkt::VertexArray> square_va_;
-	std::shared_ptr<majkt::Texture2D> texture_;
+	std::shared_ptr<majkt::Texture2D> texture_, blended_texture_;
 
 	majkt::OrthographicCamera camera_;
 	glm::vec3 camerposition__;

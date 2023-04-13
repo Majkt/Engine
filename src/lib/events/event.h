@@ -55,18 +55,17 @@ class MAJKT_BASE_EXPORT Event
 
 class EventDispatcher
 {
-    template<typename T>
-    using EventFn = std::function<bool(T&)>;
     public:
         EventDispatcher(Event& event)
             : event_(event) {}
 
-        template<typename T>
-        bool Dispatch(EventFn<T> func)
+		// F will be deduced by the compiler
+		template<typename T, typename F>
+		bool Dispatch(const F& func)
         {
             if (event_.GetEventType() == T::GetStaticType())
             {
-                event_.handled_ = func(*(T*)&event_);
+                event_.handled_ = func(static_cast<T&>(event_));
                 return true;
             }
             return false;

@@ -9,7 +9,12 @@ namespace majkt
     // Defines the interface for input, which should be implemented for each platform.
 	class MAJKT_BASE_EXPORT Input
 	{
+	protected:
+		Input() = default;
 	public:
+		Input(const Input&) = delete;
+		Input& operator=(const Input&) = delete;
+		
 		inline static bool IsKeyPressed(int keycode) { return instance_->IsKeyPressedImpl(keycode); }
 
 		inline static bool IsMouseButtonPressed(int button) { return instance_->IsMouseButtonPressedImpl(button); }

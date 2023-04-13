@@ -21,6 +21,8 @@ namespace majkt
 		instance_ = this;
         window_ = std::unique_ptr<Window>(Window::Create());
         window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));
+		
+		Renderer::Init();
 
 		imgui_layer_ = new ImGuiLayer();
 		PushOverlay(imgui_layer_);
