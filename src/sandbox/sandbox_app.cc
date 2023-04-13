@@ -116,35 +116,7 @@ public:
 
 		flat_color_shader_.reset(majkt::Shader::Create(flat_color_shader_vertex_src, flat_color_shader_fragment_src));
 			
-		std::string texture_shader_vertex_src_ = R"(
-			#version 410 core
-			
-			layout(location = 0) in vec3 position_;
-			layout(location = 1) in vec2 texture_coord_;
-			uniform mat4 view_projection_;
-			uniform mat4 transform_;
-			out vec2 view_texture_coord_;
-			void main()
-			{
-				view_texture_coord_ = texture_coord_;
-				gl_Position = view_projection_ * transform_ * vec4(position_, 1.0);	
-			}
-		)";
-
-		std::string texture_shader_fragment_src_ = R"(
-			#version 410 core
-			
-			layout(location = 0) out vec4 color;
-			in vec2 view_texture_coord_;
-			
-			uniform sampler2D texture_;
-			void main()
-			{
-				color = texture(texture_, view_texture_coord_);
-			}
-		)";
-
-		texture_shader_.reset(majkt::Shader::Create(texture_shader_vertex_src_, texture_shader_fragment_src_));
+		texture_shader_.reset(majkt::Shader::Create(get_current_dir() + "/src/sandbox/assets/shaders/Texture.glsl"));
 
 		texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/style.png");
 		blended_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/crown.png");
