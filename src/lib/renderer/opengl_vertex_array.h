@@ -21,6 +21,7 @@ namespace majkt {
 		virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return index_buffer_; }
 	private:
 		uint32_t renderer_id_;
+		uint32_t vertex_buffer_index_{0};
 		std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers_;
 		std::shared_ptr<IndexBuffer> index_buffer_;
 	};

@@ -7,7 +7,7 @@ class ExampleLayer : public majkt::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), camera_(-1.6f, 1.6f, -0.9f, 0.9f), camera_position_(0.0f)
+		: Layer("Example"), camera_(-1.6f, 1.6f, -0.9f, 0.9f), camerposition__(0.0f)
 	{
 		vertex_array_.reset(majkt::VertexArray::Create());
 
@@ -33,17 +33,18 @@ public:
 
 		square_va_.reset(majkt::VertexArray::Create());
 
-		float squareVertices[3 * 4] = {
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f
+		float squareVertices[5 * 4] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
-		
+
 		std::shared_ptr<majkt::VertexBuffer> squareVB;
 		squareVB.reset(majkt::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 		squareVB->SetLayout({
-			{ majkt::ShaderDataType::Float3, "position_" }
+			{ majkt::ShaderDataType::Float3, "position_" },
+			{ majkt::ShaderDataType::Float2, "texture_coord_" }
 		});
 		square_va_->AddVertexBuffer(squareVB);
 
@@ -114,18 +115,53 @@ public:
 		)";
 
 		flat_color_shader_.reset(majkt::Shader::Create(flat_color_shader_vertex_src, flat_color_shader_fragment_src));
+			
+		std::string texture_shader_vertex_src_ = R"(
+			#version 410 core
+			
+			layout(location = 0) in vec3 position_;
+			layout(location = 1) in vec2 texture_coord_;
+			uniform mat4 view_projection_;
+			uniform mat4 transform_;
+			out vec2 view_texture_coord_;
+			void main()
+			{
+				view_texture_coord_ = texture_coord_;
+				gl_Position = view_projection_ * transform_ * vec4(position_, 1.0);	
+			}
+		)";
+
+		std::string texture_shader_fragment_src_ = R"(
+			#version 410 core
+			
+			layout(location = 0) out vec4 color;
+			in vec2 view_texture_coord_;
+			
+			uniform sampler2D texture_;
+			void main()
+			{
+				color = texture(texture_, view_texture_coord_);
+			}
+		)";
+
+		texture_shader_.reset(majkt::Shader::Create(texture_shader_vertex_src_, texture_shader_fragment_src_));
+
+		texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/arm_showroom_ddn.png");
+		std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader_)->Bind();
+		std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader_)->UploadUniformInt("texture_", 0);
 	}
+	
 	void OnUpdate(majkt::Timestep timestep) override
 	{
 		if (majkt::Input::IsKeyPressed(MAJKT_KEY_LEFT))
-			camera_position_.x -= camera_move_speed_ * timestep;
+			camerposition__.x -= camera_move_speed_ * timestep;
 		else if (majkt::Input::IsKeyPressed(MAJKT_KEY_RIGHT))
-			camera_position_.x += camera_move_speed_ * timestep;
+			camerposition__.x += camera_move_speed_ * timestep;
 
 		if (majkt::Input::IsKeyPressed(MAJKT_KEY_UP))
-			camera_position_.y += camera_move_speed_ * timestep;
+			camerposition__.y += camera_move_speed_ * timestep;
 		else if (majkt::Input::IsKeyPressed(MAJKT_KEY_DOWN))
-			camera_position_.y -= camera_move_speed_ * timestep;
+			camerposition__.y -= camera_move_speed_ * timestep;
 
 		if (majkt::Input::IsKeyPressed(MAJKT_KEY_A))
 			camera_rotation_ += camera_rotation_speed_ * timestep;
@@ -135,7 +171,7 @@ public:
 		majkt::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		majkt::RenderCommand::Clear();
 
-		camera_.SetPosition(camera_position_);
+		camera_.SetPosition(camerposition__);
 		camera_.SetRotation(camera_rotation_);
 
 		majkt::Renderer::BeginScene(camera_);
@@ -155,7 +191,11 @@ public:
 			}
 		}
 		
-		majkt::Renderer::Submit(shader_, vertex_array_);
+		texture_->Bind();
+		majkt::Renderer::Submit(texture_shader_, square_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
+		// Triangle
+		// majkt::Renderer::Submit(shader_, vertex_array_);
 
 		majkt::Renderer::EndScene();
 	}
@@ -174,11 +214,12 @@ private:
 	std::shared_ptr<majkt::Shader> shader_;
 	std::shared_ptr<majkt::VertexArray> vertex_array_;
 
-	std::shared_ptr<majkt::Shader> flat_color_shader_;
+	std::shared_ptr<majkt::Shader> flat_color_shader_, texture_shader_;
 	std::shared_ptr<majkt::VertexArray> square_va_;
+	std::shared_ptr<majkt::Texture2D> texture_;
 
 	majkt::OrthographicCamera camera_;
-	glm::vec3 camera_position_;
+	glm::vec3 camerposition__;
 	float camera_move_speed_{5.0f};
 	float camera_rotation_{0.0f};
 	float camera_rotation_speed_{180.0f};

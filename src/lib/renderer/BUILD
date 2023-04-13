@@ -10,5 +10,7 @@ cc_library(
         "@glfw//:glfw",
         "//third_party/glad",
         "//third_party/glm",
-    ]
+        "//third_party/stb_image",
+    ],
+    data = ["//src/sandbox:assets"]
 )

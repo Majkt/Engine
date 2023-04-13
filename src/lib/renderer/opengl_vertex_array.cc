@@ -51,18 +51,17 @@ namespace majkt {
 		glBindVertexArray(renderer_id_);
 		vertexBuffer->Bind();
 
-		uint32_t index = 0;
 		const auto& layout = vertexBuffer->GetLayout();
 		for (const auto& element : layout)
 		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index,
+			glEnableVertexAttribArray(vertex_buffer_index_);
+			glVertexAttribPointer(vertex_buffer_index_,
 				element.GetComponentCount(),
 				ShaderDataTypeToOpenGLBaseType(element.Type),
 				element.Normalized ? GL_TRUE : GL_FALSE,
 				layout.GetStride(),
-				(const void*)element.Offset);
-			index++;
+				(const void*)(intptr_t)element.Offset);
+			vertex_buffer_index_++;
 		}
 		vertex_buffers_.push_back(vertexBuffer);
 	}

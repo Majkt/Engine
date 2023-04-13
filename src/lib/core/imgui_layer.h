@@ -24,8 +24,6 @@ namespace majkt {
 		void End();
 	private:
 		float time_{0.0};
-		bool show_demo_window_{true};
-		bool show_another_window_{false};
 	};
 
 }
