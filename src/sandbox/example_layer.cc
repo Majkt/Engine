@@ -15,8 +15,7 @@ ExampleLayer::ExampleLayer()
 			0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 	};
 
-	std::shared_ptr<majkt::VertexBuffer> vertexBuffer;
-	vertexBuffer.reset(majkt::VertexBuffer::Create(vertices, sizeof(vertices)));
+	std::shared_ptr<majkt::VertexBuffer> vertexBuffer = majkt::VertexBuffer::Create(vertices, sizeof(vertices));
 	majkt::BufferLayout layout = {
 		{ majkt::ShaderDataType::Float3, "position_" },
 		{ majkt::ShaderDataType::Float4, "color_" }
@@ -25,8 +24,7 @@ ExampleLayer::ExampleLayer()
 	vertex_array_->AddVertexBuffer(vertexBuffer);
 
 	uint32_t indices[3] = { 0, 1, 2 };
-	std::shared_ptr<majkt::IndexBuffer> indexBuffer;
-	indexBuffer.reset(majkt::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+	std::shared_ptr<majkt::IndexBuffer> indexBuffer = majkt::IndexBuffer::Create(indices, sizeof(uint32_t));
 	vertex_array_->SetIndexBuffer(indexBuffer);
 
 	square_va_ = majkt::VertexArray::Create();
@@ -38,8 +36,7 @@ ExampleLayer::ExampleLayer()
 		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 	};
 
-	std::shared_ptr<majkt::VertexBuffer> squareVB;
-	squareVB.reset(majkt::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+	std::shared_ptr<majkt::VertexBuffer> squareVB = majkt::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 	squareVB->SetLayout({
 		{ majkt::ShaderDataType::Float3, "position_" },
 		{ majkt::ShaderDataType::Float2, "texture_coord_" }
@@ -47,8 +44,7 @@ ExampleLayer::ExampleLayer()
 	square_va_->AddVertexBuffer(squareVB);
 
 	uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-	std::shared_ptr<majkt::IndexBuffer> squareIB;
-	squareIB.reset(majkt::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+	std::shared_ptr<majkt::IndexBuffer> squareIB = majkt::IndexBuffer::Create(squareIndices, sizeof(uint32_t));
 	square_va_->SetIndexBuffer(squareIB);
 
 	std::string vertex_src = R"(
@@ -119,8 +115,8 @@ ExampleLayer::ExampleLayer()
 	texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/style.png");
 	blended_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/crown.png");
 	
-	std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader)->Bind();
-	std::dynamic_pointer_cast<majkt::OpenGLShader>(texture_shader)->UploadUniformInt("texture_", 0);
+	texture_shader->Bind();
+	texture_shader->SetInt("texture_", 0);
 }
 
 void ExampleLayer::OnAttach()
@@ -142,9 +138,9 @@ void ExampleLayer::OnUpdate(majkt::Timestep timestep)
 
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-	std::dynamic_pointer_cast<majkt::OpenGLShader>(flat_color_shader_)->Bind();
-	std::dynamic_pointer_cast<majkt::OpenGLShader>(flat_color_shader_)->UploadUniformFloat3("color_", square_color_);
-	
+	flat_color_shader_->Bind();
+	flat_color_shader_->SetFloat3("color_", square_color_);
+
 	for (int y = 0; y < 20; y++)
 	{
 		for (int x = 0; x < 20; x++)

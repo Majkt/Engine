@@ -2,7 +2,7 @@
 #include "src/lib/events/application_events.h"
 #include "src/lib/events/mouse_events.h"
 #include "src/lib/events/key_events.h"
-#include "src/lib/platform/opengl/opengl_context.h"
+#include "src/lib/renderer/opengl_context.h"
 
 #include <glog/logging.h>
 #include "glog/stl_logging.h"
@@ -55,7 +55,7 @@ namespace majkt {
 
 		glfwSetWindowUserPointer(window_, &data_);
 
-		context_ = std::make_unique<OpenGLContext>(window_);
+		context_ = GraphicsContext::Create(window_);
 		context_->Init();
 
 		glfwSetWindowUserPointer(window_, &data_);

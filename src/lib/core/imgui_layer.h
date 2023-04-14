@@ -10,7 +10,7 @@
 
 namespace majkt {
 
-	class MAJKT_BASE_EXPORT ImGuiLayer : public Layer
+	class ImGuiLayer : public Layer
 	{
 	public:
 		ImGuiLayer();

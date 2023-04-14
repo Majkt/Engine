@@ -9,7 +9,7 @@
 
 namespace majkt 
 {
-	class MAJKT_BASE_EXPORT Layer
+	class Layer
 	{
 	public:
 		Layer(const std::string& debugName = "Layer");

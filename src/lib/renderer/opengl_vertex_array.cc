@@ -9,17 +9,17 @@ namespace majkt {
 	{
 		switch (type)
 		{
-			case majkt::ShaderDataType::Float:    return GL_FLOAT;
-			case majkt::ShaderDataType::Float2:   return GL_FLOAT;
-			case majkt::ShaderDataType::Float3:   return GL_FLOAT;
-			case majkt::ShaderDataType::Float4:   return GL_FLOAT;
-			case majkt::ShaderDataType::Mat3:     return GL_FLOAT;
-			case majkt::ShaderDataType::Mat4:     return GL_FLOAT;
-			case majkt::ShaderDataType::Int:      return GL_INT;
-			case majkt::ShaderDataType::Int2:     return GL_INT;
-			case majkt::ShaderDataType::Int3:     return GL_INT;
-			case majkt::ShaderDataType::Int4:     return GL_INT;
-			case majkt::ShaderDataType::Bool:     return GL_BOOL;
+			case ShaderDataType::Float:    return GL_FLOAT;
+			case ShaderDataType::Float2:   return GL_FLOAT;
+			case ShaderDataType::Float3:   return GL_FLOAT;
+			case ShaderDataType::Float4:   return GL_FLOAT;
+			case ShaderDataType::Mat3:     return GL_FLOAT;
+			case ShaderDataType::Mat4:     return GL_FLOAT;
+			case ShaderDataType::Int:      return GL_INT;
+			case ShaderDataType::Int2:     return GL_INT;
+			case ShaderDataType::Int3:     return GL_INT;
+			case ShaderDataType::Int4:     return GL_INT;
+			case ShaderDataType::Bool:     return GL_BOOL;
 			default: 							  break;
 		}
 

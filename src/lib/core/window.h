@@ -23,7 +23,7 @@ namespace majkt {
 	};
 
 	// Interface representing a desktop system based Window
-	class MAJKT_BASE_EXPORT Window
+	class Window
 	{
 	    public:
             using EventCallbackFn = std::function<void(Event&)>;

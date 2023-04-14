@@ -19,8 +19,8 @@ namespace majkt
 			LOG(WARNING) << instance_ <<  " Application already exists!";
 		}
 		instance_ = this;
-        window_ = std::unique_ptr<Window>(Window::Create());
-        window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));
+		window_ = Window::Create();
+		window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));
 		
 		Renderer::Init();
 
@@ -28,6 +28,11 @@ namespace majkt
 		PushOverlay(imgui_layer_);
 	}
 
+	Application::~Application()
+	{
+		Renderer::Shutdown();
+	}
+	
     void Application::Run()
     {
         while (running_){

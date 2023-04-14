@@ -10,7 +10,6 @@ cc_library(
         "//src/lib/core:core",
         "//src/lib/events:events",
         "//src/lib/renderer:renderer",
-        "//src/lib/platform/opengl:opengl",
         "@glfw//:glfw",
         "//third_party/glad",
     ],

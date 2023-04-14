@@ -7,7 +7,7 @@
 namespace majkt
 {
     // Defines the interface for input, which should be implemented for each platform.
-	class MAJKT_BASE_EXPORT Input
+	class Input
 	{
 	protected:
 		Input() = default;

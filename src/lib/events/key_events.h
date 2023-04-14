@@ -5,7 +5,7 @@
 #include <sstream>
 
 namespace majkt {
-class MAJKT_BASE_EXPORT KeyEvent : public Event
+class KeyEvent : public Event
 {
     public:
         inline int GetKeyCode() const { return key_code_; }
@@ -18,7 +18,7 @@ class MAJKT_BASE_EXPORT KeyEvent : public Event
         int key_code_;
 };
 
-class MAJKT_BASE_EXPORT KeyPressedEvent : public KeyEvent
+class KeyPressedEvent : public KeyEvent
 {
     public:
         KeyPressedEvent(int keycode, int repeatCount)
@@ -38,7 +38,7 @@ class MAJKT_BASE_EXPORT KeyPressedEvent : public KeyEvent
         int repeat_count_;
 };
 
-class MAJKT_BASE_EXPORT KeyReleasedEvent : public KeyEvent
+class KeyReleasedEvent : public KeyEvent
 {
     public:
         KeyReleasedEvent(int keycode)
@@ -54,7 +54,7 @@ class MAJKT_BASE_EXPORT KeyReleasedEvent : public KeyEvent
         EVENT_CLASS_TYPE(kKeyReleased)
 };
 
-class MAJKT_BASE_EXPORT KeyTypedEvent : public KeyEvent
+class KeyTypedEvent : public KeyEvent
 {
 public:
     KeyTypedEvent(int keycode)

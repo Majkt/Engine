@@ -2,10 +2,6 @@
 
 namespace majkt {
 
-	LayerStack::LayerStack()
-	{	
-	}
-
 	LayerStack::~LayerStack()
 	{
 		for (Layer* layer : layers_) 

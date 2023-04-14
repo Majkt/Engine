@@ -17,6 +17,7 @@ namespace majkt {
 	std::unique_ptr<Window> Window::Create(const WindowProps& props)
 	{
         #ifdef MAJKT_PLATFORM_WINDOWS
+        
             return std::make_unique<WindowsWindow>(props);
         #elif defined(MAJKT_PLATFORM_MACOS)
             return std::make_unique<MacOSWindow>(props);

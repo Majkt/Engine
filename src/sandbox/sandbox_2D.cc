@@ -1,7 +1,5 @@
 #include "src/sandbox/sandbox_2D.h"
 
-#include "src/lib/renderer/opengl_shader.h"
-
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -12,6 +10,7 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
+	checker_board_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/Checkerboard.png");
 }
 
 void Sandbox2D::OnDetach()
@@ -28,7 +27,9 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
 	majkt::RenderCommand::Clear();
 
 	majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
-	majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+	majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+	majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, { 0.2f, 0.3f, 0.8f, 1.0f });
+	majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_);
 	majkt::Renderer2D::EndScene();
 }
 

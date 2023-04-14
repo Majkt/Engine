@@ -22,6 +22,7 @@ namespace majkt {
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) = 0;
 
 		inline static API GetAPI() { return api_; }
+		static std::unique_ptr<RendererAPI> Create();
 	private:
 		static API api_;
 	};

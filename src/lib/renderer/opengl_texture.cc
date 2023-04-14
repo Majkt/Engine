@@ -2,13 +2,27 @@
 
 #include <stb/stb_image.h>
 
-#include <glad/glad.h>
-
 #include <glog/logging.h>
 #include "glog/stl_logging.h"
 #include <iostream>
 
 namespace majkt {
+	
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
+		: width_(width), height_(height)
+	{
+		internal_format_ = GL_RGBA8;
+		data_format_ = GL_RGBA;
+
+        glGenTextures(1, &renderer_id_);
+        glBindTexture(GL_TEXTURE_2D, renderer_id_);
+		
+		// glTexStorage2D(GL_TEXTURE_2D, 1, internal_format_, width_, height_);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		: path_(path)
@@ -35,6 +49,9 @@ namespace majkt {
 			dataFormat = GL_RGB;
 		}
 
+		internal_format_ = internalFormat;
+		data_format_ = dataFormat;
+
         glGenTextures(1, &renderer_id_);
         glBindTexture(GL_TEXTURE_2D, renderer_id_);
         
@@ -55,6 +72,15 @@ namespace majkt {
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		glDeleteTextures(1, &renderer_id_);
+	}
+
+	void OpenGLTexture2D::SetData(void* data, uint32_t size)
+	{
+		uint32_t bpp = data_format_ == GL_RGBA ? 4 : 3;
+		if (size != width_ * height_ * bpp) LOG(FATAL) << "Data must be entire texture!";
+		// glTextureSubImage2D(renderer_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, internal_format_, width_, height_, 0, data_format_, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const

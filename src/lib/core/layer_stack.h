@@ -7,10 +7,10 @@
 
 namespace majkt 
 {
-	class MAJKT_BASE_EXPORT LayerStack
+	class LayerStack
 	{
 	public:
-		LayerStack();
+		LayerStack() = default;
 		~LayerStack();
 
 		void PushLayer(Layer* layer);

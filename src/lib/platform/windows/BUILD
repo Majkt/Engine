@@ -9,7 +9,7 @@ cc_library(
         "@glog",
         "//src/lib/core:core",
         "//src/lib/events:events",
-        "//src/lib/platform/opengl:opengl",
+        "//src/lib/renderer:renderer",
         "@glfw//:glfw",
         "//third_party/glad",
     ],

@@ -20,7 +20,7 @@ private:
 
 	std::shared_ptr<majkt::VertexArray> square_va_;
 	std::shared_ptr<majkt::Shader> flat_color_shader_;
-
+	std::shared_ptr<majkt::Texture2D> checker_board_texture_;
 	glm::vec4 square_color_ = { 0.2f, 0.3f, 0.8f, 1.0f };
 };
 
