@@ -17,8 +17,8 @@ namespace majkt {
 		virtual void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) override;
 		virtual void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer) override;
 
-		virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const { return vertex_buffers_; }
-		virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return index_buffer_; }
+		virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const override { return vertex_buffers_; }
+		virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const override { return index_buffer_; }
 	private:
 		uint32_t renderer_id_;
 		uint32_t vertex_buffer_index_{0};

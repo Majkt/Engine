@@ -1,5 +1,6 @@
 #include "src/lib/renderer/opengl_shader.h"
 
+#include <array>
 #include <fstream>
 #include <iostream>
 #include <filesystem>

@@ -15,6 +15,7 @@ namespace majkt {
 		{
 			case RendererAPI::API::None:    LOG(WARNING) << "RendererAPI::None is currently not supported!"; return nullptr;
 			case RendererAPI::API::OpenGL:  return new OpenGLVertexBuffer(vertices, size);
+			default: break;
 		}
 
 		LOG(WARNING) << "Unknown RendererAPI!";
@@ -27,6 +28,7 @@ namespace majkt {
 		{
 			case RendererAPI::API::None:    LOG(WARNING) << "RendererAPI::None is currently not supported!"; return nullptr;
 			case RendererAPI::API::OpenGL:  return new OpenGLIndexBuffer(indices, size);
+			default: break;
 		}
 
 		LOG(WARNING) << "Unknown RendererAPI!";

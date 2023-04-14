@@ -7,7 +7,7 @@ class ExampleLayer : public majkt::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), camera_controller_(1280.0f / 720.0f)
+		: Layer("Example"), camera_controller_(1280.0f / 720.0f, true)
 	{
 		vertex_array_.reset(majkt::VertexArray::Create());
 

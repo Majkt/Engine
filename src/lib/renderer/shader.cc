@@ -14,6 +14,7 @@ namespace majkt {
 		{
 			case RendererAPI::API::None:    LOG(WARNING) << "RendererAPI::None is currently not supported!"; return nullptr;
 			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLShader>(filepath);
+			default: 						break;	
 		}
 
 		LOG(WARNING) << "Unknown RendererAPI!";
@@ -26,6 +27,7 @@ namespace majkt {
 		{
 			case RendererAPI::API::None:    LOG(WARNING) << "RendererAPI::None is currently not supported!"; return nullptr;
 			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
+			default: 						break;
 		}
 
 		LOG(WARNING) << "Unknown RendererAPI!";

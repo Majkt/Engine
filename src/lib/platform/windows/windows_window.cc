@@ -104,6 +104,8 @@ namespace majkt {
 					data.event_callback_(event);
 					break;
 				}
+				default:
+  					break;
 			}
 		});
 
@@ -133,6 +135,8 @@ namespace majkt {
 					data.event_callback_(event);
 					break;
 				}
+				default:
+  					break;
 			}
 		});
 

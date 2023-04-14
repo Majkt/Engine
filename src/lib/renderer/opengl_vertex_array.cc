@@ -20,6 +20,7 @@ namespace majkt {
 			case majkt::ShaderDataType::Int3:     return GL_INT;
 			case majkt::ShaderDataType::Int4:     return GL_INT;
 			case majkt::ShaderDataType::Bool:     return GL_BOOL;
+			default: 							  break;
 		}
 
 		LOG(WARNING) << "Unknown ShaderDataType!";
