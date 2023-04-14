@@ -30,7 +30,7 @@ namespace majkt
 		virtual float GetMouseYImpl() = 0;
 	private:
         // The input instance does is owned by this class, instead its a reference to the static instance.
-		static Input* instance_;
+		static std::unique_ptr<Input> instance_;
 	};
 
 } // namespace majkt

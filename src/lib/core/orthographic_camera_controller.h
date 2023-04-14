@@ -19,6 +19,8 @@ namespace majkt {
 		OrthographicCamera& GetCamera() { return camera_; }
 		const OrthographicCamera& GetCamera() const { return camera_; }
 	private:
+		float GetZoomLevel() const { return zoom_level_; }
+		void SetZoomLevel(float level) { zoom_level_ = level; }
 		bool OnMouseScrolled(MouseScrolledEvent& e);
 		bool OnWindowResized(WindowResizeEvent& e);
 	private:

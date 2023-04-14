@@ -35,8 +35,9 @@ namespace majkt
 			Timestep timestep = time - last_frame_time_;
 			last_frame_time_ = time;
 
-			for (Layer* layer : layer_stack_)
-				layer->OnUpdate(timestep);
+			if (!minimized_)
+				for (Layer* layer : layer_stack_)
+					layer->OnUpdate(timestep);
 
 			imgui_layer_->Begin();
 			for (Layer* layer : layer_stack_)
@@ -51,7 +52,8 @@ namespace majkt
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(absl::bind_front(&Application::OnWindowClose, this));
-
+		dispatcher.Dispatch<WindowResizeEvent>(absl::bind_front(&Application::OnWindowResize, this));
+		
 		for (auto it = layer_stack_.end(); it != layer_stack_.begin(); )
 		{
 			(*--it)->OnEvent(e);
@@ -70,11 +72,24 @@ namespace majkt
 		layer_stack_.PushOverlay(layer);
 	}
 
-
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		running_ = false;
 		return true;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			minimized_ = true;
+			return false;
+		}
+
+		minimized_ = false;
+		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 
 } // namespace majkt

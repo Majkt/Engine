@@ -5,7 +5,7 @@
 
 namespace majkt {
     
-	Input* Input::instance_ = new WindowsInput();
+	std::unique_ptr<Input> Input::instance_ = std::make_unique<WindowsInput>();
 
 	bool WindowsInput::IsKeyPressedImpl(int keycode)
 	{

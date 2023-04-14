@@ -11,6 +11,7 @@ namespace majkt {
 	{
         public:
 			static void Init();
+			static void OnWindowResize(uint32_t width, uint32_t height);
 			static void BeginScene(OrthographicCamera& camera);
 			static void EndScene();
 			static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
@@ -21,7 +22,7 @@ namespace majkt {
 				glm::mat4 ViewProjectionMatrix;
 			};
 
-			static SceneData* scene_data_;
+			static std::unique_ptr<SceneData> scene_data_;
 		};
 
 } // namespace majkt

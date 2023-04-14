@@ -56,7 +56,7 @@ namespace majkt {
 
 		window_ = glfwCreateWindow((int)props.width_, (int)props.height_, data_.title_.c_str(), nullptr, nullptr);
 
-		context_ = new OpenGLContext(window_);
+		context_ = std::make_unique<OpenGLContext>(window_);
 		context_->Init();
 		
 		glfwSetWindowUserPointer(window_, &data_);

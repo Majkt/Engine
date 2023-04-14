@@ -5,7 +5,7 @@
 
 namespace majkt {
 
-	Input* Input::instance_ = new MacOSInput();
+	std::unique_ptr<Input> Input::instance_ = std::make_unique<MacOSInput>();
 
 	bool MacOSInput::IsKeyPressedImpl(int keycode)
 	{

@@ -3,6 +3,6 @@
 
 namespace majkt {
 
-	RendererAPI* RenderCommand::renderer_api_ = new OpenGLRendererAPI;
+	std::unique_ptr<RendererAPI> RenderCommand::renderer_api_ = std::make_unique<OpenGLRendererAPI>();
 
 }

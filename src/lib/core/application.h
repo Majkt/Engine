@@ -25,10 +25,12 @@ namespace majkt
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
 		std::unique_ptr<Window> window_;
 		ImGuiLayer* imgui_layer_;
 		bool running_{true};
+		bool minimized_{false};
 		LayerStack layer_stack_;
 		float last_frame_time_{0.0f};
 		

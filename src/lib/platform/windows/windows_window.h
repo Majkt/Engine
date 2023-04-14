@@ -34,7 +34,7 @@ namespace majkt {
 		virtual void Shutdown();
 	private:
 		GLFWwindow* window_;
-		GraphicsContext* context_;
+		std::unique_ptr<GraphicsContext> context_;
 
 		struct WindowData
 		{
