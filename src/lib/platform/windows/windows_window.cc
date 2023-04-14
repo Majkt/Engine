@@ -12,7 +12,7 @@
 
 namespace majkt {
 
-	static bool glfw_initialized_{false};
+	static uint8_t glfw_initialized_{0};
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
@@ -37,20 +37,19 @@ namespace majkt {
 
 		LOG(INFO) << "Creating window " << props.title_ << " " << props.width_ << " " << props.height_;
 
-		if (!glfw_initialized_)
+		if (glfw_initialized_ == 0)
 		{
 			// TODO: glfwTerminate on system shutdown
 			int success = glfwInit();
             LOG(INFO) << "glfwInit() = " << success;
 
 			glfwSetErrorCallback(GLFWErrorCallback);
-			
-			glfw_initialized_ = true;
 		}
+		++glfw_initialized_;
 
 		// GL 3.0 + GLSL 130
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
 		window_ = glfwCreateWindow((int)props.width_, (int)props.height_, data_.title_.c_str(), nullptr, nullptr);
 
@@ -159,8 +158,11 @@ namespace majkt {
 
 	void WindowsWindow::Shutdown()
 	{
-		glfwDestroyWindow(window_);
-		glfwTerminate();
+		if (--glfw_initialized_ == 0)
+		{
+			glfwDestroyWindow(window_);
+			glfwTerminate();
+		}
 	}
 
 	void WindowsWindow::OnUpdate()

@@ -8,7 +8,13 @@ filegroup(
 
 cc_binary(
     name = "sandbox_app",
-    srcs = ["sandbox_app.cc"],
+    srcs = [
+        "sandbox_app.cc",
+        "sandbox_2D.h",
+        "sandbox_2D.cc",
+        "example_layer.h",
+        "example_layer.cc",
+    ],
     deps = [
         "//src/lib:engine", 
     ],

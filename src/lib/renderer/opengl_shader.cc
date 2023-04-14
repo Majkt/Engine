@@ -21,7 +21,7 @@ namespace majkt {
 		if (type == "fragment" || type == "pixel")
 			return GL_FRAGMENT_SHADER;
 
-		LOG(WARNING) << "Unknown shader type!";
+		LOG(FATAL) << "Unknown shader type!";
 		return 0;
 	}
 

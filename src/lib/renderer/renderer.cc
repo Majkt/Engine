@@ -1,5 +1,7 @@
 #include "src/lib/renderer/renderer.h"
+#include "src/lib/renderer/renderer2D.h"
 #include "src/lib/renderer/opengl_shader.h"
+
 namespace majkt {
 
 	std::unique_ptr<Renderer::SceneData> Renderer::scene_data_ = std::make_unique<Renderer::SceneData>();
@@ -7,6 +9,7 @@ namespace majkt {
 	void Renderer::Init()
 	{
 		RenderCommand::Init();
+		Renderer2D::Init();
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
