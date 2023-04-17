@@ -5,8 +5,6 @@ cc_library(
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
-<<<<<<< HEAD
-=======
     deps = [
         "@glog",
         "@glfw//:glfw",
@@ -17,5 +15,4 @@ cc_library(
         "@com_google_absl//absl/functional:bind_front",
     ],
     data = ["//src/sandbox:assets"]
->>>>>>> e45a19bcb534a7ce42c20f46b456e8f4430a992e
 )

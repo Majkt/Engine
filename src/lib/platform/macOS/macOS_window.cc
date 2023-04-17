@@ -13,16 +13,12 @@
 
 namespace majkt {
 
-<<<<<<< HEAD
-	static bool glfw_initialized_{false};
-=======
 	static uint8_t glfw_initialized_{0};
 	
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		LOG(ERROR) << "GLFW Error: " << error << " " << description;
 	}
->>>>>>> e45a19bcb534a7ce42c20f46b456e8f4430a992e
 
 	MacOSWindow::MacOSWindow(const WindowProps& props)
 	{

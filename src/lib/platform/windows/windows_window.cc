@@ -15,26 +15,26 @@ namespace majkt {
 
 	static uint8_t glfw_initialized_{0};
 
-<<<<<<< HEAD
-=======
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		LOG(ERROR) << "GLFW Error: " << error << " " << description;
 	}
 
->>>>>>> e45a19bcb534a7ce42c20f46b456e8f4430a992e
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		MAJKT_PROFILE_FUNCTION();
 		Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
+		MAJKT_PROFILE_FUNCTION();
 		Shutdown();
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		MAJKT_PROFILE_FUNCTION();
 		data_.title_ = props.title_;
 		data_.width_ = props.width_;
 		data_.height_ = props.height_;
