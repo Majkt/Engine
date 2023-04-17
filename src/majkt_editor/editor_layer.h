@@ -23,7 +23,14 @@ namespace majkt {
 		// Temp
 		std::shared_ptr<VertexArray> square_vertex_array_;
 		std::shared_ptr<Shader> flat_color_shader_;
-		std::shared_ptr<Framebuffer> frame_buffer_;
+		std::shared_ptr<Framebuffer> framebuffer_;
+
+		std::shared_ptr<Scene> active_scene_;
+		Entity square_entity_;
+		Entity camera_entity_;
+		Entity second_camera_;
+
+		bool primary_camera_{true};
 
 		std::shared_ptr<Texture2D> checker_board_texture_, style_texture_;
 		bool viewport_focused_ = false, viewport_hovered_ = false;

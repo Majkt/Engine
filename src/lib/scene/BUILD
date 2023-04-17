@@ -1,18 +1,22 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "macOS",
+    name = "scene",
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
     deps = [
+        "@entt//:entt",
         "@glog",
-        "//src/lib/core:core",
-        "//src/lib/events:events",
-        "//src/lib/renderer:renderer",
         "@glfw//:glfw",
+        "//src/lib/debug:debug",
         "//third_party/glad",
-    ],
+        "//third_party/glm",
+        "//third_party/stb_image",
+        "@com_google_absl//absl/functional:bind_front",
+        "//src/lib/renderer:renderer",
+        "//src/lib/core:core",
+    ]
 )
 
 load("//tools:cpplint.bzl", "cpplint")

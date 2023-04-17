@@ -143,6 +143,21 @@ namespace majkt {
 		data_.TextureSlotIndex = 1;
     }
 
+	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
+	{
+		MAJKT_PROFILE_FUNCTION();
+
+		glm::mat4 viewProj = camera.GetProjection() * glm::inverse(transform);
+
+		data_.TextureShader->Bind();
+		data_.TextureShader->SetMat4("view_projection_", viewProj);
+
+		data_.QuadIndexCount = 0;
+		data_.QuadVertexBufferPtr = data_.QuadVertexBufferBase;
+
+		data_.TextureSlotIndex = 1;
+	}
+
 	void Renderer2D::EndScene()
 	{
 		MAJKT_PROFILE_FUNCTION();
@@ -182,7 +197,32 @@ namespace majkt {
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		MAJKT_PROFILE_FUNCTION();
+		
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
+		DrawQuad(transform, color);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	{
+		MAJKT_PROFILE_FUNCTION();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		DrawQuad(transform, texture, tilingFactor);
+	}
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	{
+		MAJKT_PROFILE_FUNCTION();
+		
 		constexpr size_t quadVertexCount = 4;
 
 		const float textureIndex = 0.0f; // White Texture
@@ -191,9 +231,6 @@ namespace majkt {
 
 		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
 			FlushAndReset();
-
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		for (size_t i{0}; i < quadVertexCount; i++)
 		{
@@ -210,12 +247,7 @@ namespace majkt {
 		data_.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
-	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor);
-	}
-
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 	{
 		MAJKT_PROFILE_FUNCTION();
 
@@ -244,9 +276,6 @@ namespace majkt {
 			data_.TextureSlots[data_.TextureSlotIndex] = texture;
 			data_.TextureSlotIndex++;
 		}
-
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		for (size_t i{0}; i < quadVertexCount; i++)
 		{
@@ -267,37 +296,16 @@ namespace majkt {
 	{
 		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, color);
 	}
-
+	
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
 		MAJKT_PROFILE_FUNCTION();
-
-		constexpr size_t quadVertexCount = 4;
-
-		const float textureIndex = 0.0f; // White Texture
-		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
-		const float tilingFactor = 1.0f;
-
-		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		for (size_t i{0}; i < quadVertexCount; i++)
-		{
-			data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[i];
-			data_.QuadVertexBufferPtr->Color = color;
-			data_.QuadVertexBufferPtr->TexCoord = textureCoords[i];
-			data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-			data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-			data_.QuadVertexBufferPtr++;
-		}
-
-		data_.QuadIndexCount += 6;
-
-		data_.Stats.QuadCount++;
+		DrawQuad(transform, color);
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
@@ -309,48 +317,11 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
-
-		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
-
-		float textureIndex = 0.0f;
-		for (uint32_t i = 1; i < data_.TextureSlotIndex; i++)
-		{
-			if (*data_.TextureSlots[i].get() == *texture.get())
-			{
-				textureIndex = (float)i;
-				break;
-			}
-		}
-
-		if (textureIndex == 0.0f)
-		{
-			if (data_.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
-				FlushAndReset();
-
-			textureIndex = (float)data_.TextureSlotIndex;
-			data_.TextureSlots[data_.TextureSlotIndex] = texture;
-			data_.TextureSlotIndex++;
-		}
-
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		for (size_t i{0}; i < quadVertexCount; i++)
-		{
-			data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[i];
-			data_.QuadVertexBufferPtr->Color = tintColor;
-			data_.QuadVertexBufferPtr->TexCoord = textureCoords[i];
-			data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-			data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-			data_.QuadVertexBufferPtr++;
-		}
-
-		data_.QuadIndexCount += 6;
-		data_.Stats.QuadCount++;
+		DrawQuad(transform, texture, tilingFactor, tintColor);
 	}
 
 	void Renderer2D::ResetStats()

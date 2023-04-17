@@ -15,3 +15,10 @@ cc_library(
     ],
 )
 
+load("//tools:cpplint.bzl", "cpplint")
+
+exports_files([
+    "CPPLINT.cfg",
+])
+
+cpplint()

@@ -8,6 +8,7 @@ cc_library(
         "layer_stack.cc",
         "imgui_layer.cc",
         "orthographic_camera_controller.cc",
+        "perspective_camera_controller.cc",
     ],
     hdrs = [
         "application.h",
@@ -23,6 +24,7 @@ cc_library(
         "timestep.h",
         "platform_detection.h",
         "orthographic_camera_controller.h",
+        "perspective_camera_controller.h",
         "window.h",
     ],
     visibility = ["//visibility:public"],
@@ -52,3 +54,11 @@ cc_library(
         "//src/lib/platform/macOS:macOS",
     ],
 )
+
+load("//tools:cpplint.bzl", "cpplint")
+
+exports_files([
+    "CPPLINT.cfg",
+])
+
+cpplint()

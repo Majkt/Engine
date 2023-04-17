@@ -11,5 +11,14 @@ cc_library(
         "//src/lib/core:core",
         "//src/lib/debug:debug",
         "//src/lib/core:window",
+        "//src/lib/scene:scene",
     ],
 )
+
+load("//tools:cpplint.bzl", "cpplint")
+
+exports_files([
+    "CPPLINT.cfg",
+])
+
+cpplint()

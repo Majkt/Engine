@@ -6,3 +6,11 @@ cc_library(
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
 )
+
+load("//tools:cpplint.bzl", "cpplint")
+
+exports_files([
+    "CPPLINT.cfg",
+])
+
+cpplint()

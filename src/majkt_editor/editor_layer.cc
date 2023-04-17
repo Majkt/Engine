@@ -19,10 +19,25 @@ namespace majkt {
 	    checker_board_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/Checkerboard.png");
 	    style_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/style.png");
 
-		majkt::FramebufferSpecification fbSpec;
+		FramebufferSpecification fbSpec;
 		fbSpec.Width = 1280;
 		fbSpec.Height = 720;
-		frame_buffer_ = majkt::Framebuffer::Create(fbSpec);
+		framebuffer_ = Framebuffer::Create(fbSpec);
+
+		active_scene_ = std::make_shared<Scene>();
+
+		// Entity
+		auto square = active_scene_->CreateEntity("Green Square");
+		square.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+
+		square_entity_ = square;
+
+		camera_entity_ = active_scene_->CreateEntity("Camera Entity");
+		camera_entity_.AddComponent<CameraComponent>();
+
+		second_camera_ = active_scene_->CreateEntity("Clip-Space Entity");
+		auto& cc = second_camera_.AddComponent<CameraComponent>();
+		cc.Primary = false;
 	}
 
 	void EditorLayer::OnDetach()
@@ -30,17 +45,19 @@ namespace majkt {
 		MAJKT_PROFILE_FUNCTION();
 	}
 
-	void EditorLayer::OnUpdate(majkt::Timestep ts)
+	void EditorLayer::OnUpdate(Timestep ts)
 	{
 		MAJKT_PROFILE_FUNCTION();
 
 		// Resize
-		if (majkt::FramebufferSpecification spec = frame_buffer_->GetSpecification();
-			viewport_size_.x > 0.0f && viewport_size_.y > 0.0f && // zero sized framebuffer is invalid
+		if (FramebufferSpecification spec = framebuffer_->GetSpecification();
+			viewport_size_.x > 0.0f && viewport_size_.y > 0.0f &&
 			(spec.Width != viewport_size_.x || spec.Height != viewport_size_.y))
 		{
-			frame_buffer_->Resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+			framebuffer_->Resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 			camera_controller_.OnResize(viewport_size_.x, viewport_size_.y);
+		
+			active_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 		}
 
 		// Update
@@ -48,39 +65,14 @@ namespace majkt {
 			camera_controller_.OnUpdate(ts);
 
 		// Render
-		majkt::Renderer2D::ResetStats();
-		{
-			MAJKT_PROFILE_SCOPE("Renderer Prep");
-			frame_buffer_->Bind();
-			majkt::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-			majkt::RenderCommand::Clear();
-		}
+		Renderer2D::ResetStats();
+		framebuffer_->Bind();
+		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		RenderCommand::Clear();
 
-		{
-			static float rotation = 0.0f;
-			rotation += ts * 50.0f;
-
-			MAJKT_PROFILE_SCOPE("Renderer Draw");
-			majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
-			majkt::Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
-			majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-			majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, square_color_);
-			majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, checker_board_texture_, 10.0f);
-			majkt::Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, rotation, style_texture_, 20.0f);
-			majkt::Renderer2D::EndScene();
-
-			// majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
-			// for (float y = -5.0f; y < 5.0f; y += 0.5f)
-			// {
-			// 	for (float x = -5.0f; x < 5.0f; x += 0.5f)
-			// 	{
-			// 		glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-			// 		majkt::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
-			// 	}
-			// }
-			// majkt::Renderer2D::EndScene();
-			frame_buffer_->Unbind();
-		}
+		// Update scene
+		active_scene_->OnUpdate(ts);
+		framebuffer_->Unbind();
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -140,7 +132,7 @@ namespace majkt {
 				// which we can't undo at the moment without finer window depth/z control.
 				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-				if (ImGui::MenuItem("Exit")) majkt::Application::Get().Close();
+				if (ImGui::MenuItem("Exit")) Application::Get().Close();
 				ImGui::EndMenu();
 			}
 
@@ -149,14 +141,39 @@ namespace majkt {
 
 		ImGui::Begin("Settings");
 
-		auto stats = majkt::Renderer2D::GetStats();
+		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-		ImGui::ColorEdit4("Square Color", glm::value_ptr(square_color_));
+		if (square_entity_)
+		{
+			ImGui::Separator();
+			auto& tag = square_entity_.GetComponent<TagComponent>().Tag;
+			ImGui::Text("%s", tag.c_str());
+
+			auto& squareColor = square_entity_.GetComponent<SpriteRendererComponent>().Color;
+			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+			ImGui::Separator();
+		}
+
+		ImGui::DragFloat3("Camera Transform",
+			glm::value_ptr(camera_entity_.GetComponent<TransformComponent>().Transform[3]));
+
+		if (ImGui::Checkbox("Camera A", &primary_camera_))
+		{
+			camera_entity_.GetComponent<CameraComponent>().Primary = primary_camera_;
+			second_camera_.GetComponent<CameraComponent>().Primary = !primary_camera_;
+		}
+
+		{
+			auto& camera = second_camera_.GetComponent<CameraComponent>().Camera;
+			float orthoSize = camera.GetOrthographicSize();
+			if (ImGui::DragFloat("Second Camera Ortho Size", &orthoSize))
+				camera.SetOrthographicSize(orthoSize);
+		}
 
 		ImGui::End();
 
@@ -167,9 +184,9 @@ namespace majkt {
 		viewport_hovered_ = ImGui::IsWindowHovered();
 		Application::Get().GetImGuiLayer()->BlockEvents(!viewport_focused_ || !viewport_hovered_);
 
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		ImVec2 viewportPanelSize{ImGui::GetContentRegionAvail()};
 		viewport_size_ = { viewportPanelSize.x, viewportPanelSize.y };
-        uint32_t textureID = frame_buffer_->GetColorAttachmentRendererID();
+		uint32_t textureID = framebuffer_->GetColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, ImVec2{ viewport_size_.x, viewport_size_.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -177,7 +194,7 @@ namespace majkt {
 		ImGui::End();
 	}
 
-	void EditorLayer::OnEvent(majkt::Event& e)
+	void EditorLayer::OnEvent(Event& e)
 	{
 		camera_controller_.OnEvent(e);
 	}

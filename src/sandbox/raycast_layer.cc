@@ -1,26 +1,26 @@
-#include "src/sandbox/sandbox_2D.h"
+#include "src/sandbox/raycast_layer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-Sandbox2D::Sandbox2D()
-	: Layer("Sandbox2D"), camera_controller_(1280.0f / 720.0f, true)
+RayCastLayer::RayCastLayer()
+	: Layer("RayCastLayer"), camera_controller_(1280.0f / 720.0f, true)
 {
 }
 
-void Sandbox2D::OnAttach()
+void RayCastLayer::OnAttach()
 {
 	MAJKT_PROFILE_FUNCTION();
 	checker_board_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/Checkerboard.png");
 	style_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/style.png");
 }
 
-void Sandbox2D::OnDetach()
+void RayCastLayer::OnDetach()
 {
 	MAJKT_PROFILE_FUNCTION();
 }
 
-void Sandbox2D::OnUpdate(majkt::Timestep ts)
+void RayCastLayer::OnUpdate(majkt::Timestep ts)
 {
 	MAJKT_PROFILE_FUNCTION();
 
@@ -41,13 +41,13 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
 		rotation += ts * 50.0f;
 
 		MAJKT_PROFILE_SCOPE("Renderer Draw");
-		majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
-		majkt::Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
-		majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, left_square_color_);
-		majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, right_square_color_);
-		majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, checker_board_texture_, 10.0f);
-		majkt::Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, rotation, style_texture_, 20.0f);
-		majkt::Renderer2D::EndScene();
+		// majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
+		// majkt::Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
+		// majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, left_square_color_);
+		// majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, right_square_color_);
+		// majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, checker_board_texture_, 10.0f);
+		// majkt::Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, rotation, style_texture_, 20.0f);
+		// majkt::Renderer2D::EndScene();
 
 		// majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
 		// for (float y = -5.0f; y < 5.0f; y += 0.5f)
@@ -58,12 +58,12 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
 		// 		majkt::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
 		// 	}
 		// }
-		majkt::Renderer2D::EndScene();
+		// majkt::Renderer2D::EndScene();
 
 	}
 }
 
-void Sandbox2D::OnImGuiRender()
+void RayCastLayer::OnImGuiRender()
 {
 	MAJKT_PROFILE_FUNCTION();
 
@@ -81,7 +81,7 @@ void Sandbox2D::OnImGuiRender()
 
 }
 
-void Sandbox2D::OnEvent(majkt::Event& e)
+void RayCastLayer::OnEvent(majkt::Event& e)
 {
 	camera_controller_.OnEvent(e);
 }

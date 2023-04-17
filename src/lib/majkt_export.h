@@ -14,6 +14,11 @@
 #include "src/lib/core/key_codes.h"
 #include "src/lib/core/mouse_button_codes.h"
 #include "src/lib/core/orthographic_camera_controller.h"
+#include "src/lib/core/perspective_camera_controller.h"
+
+#include "src/lib/scene/entity.h"
+#include "src/lib/scene/components.h"
+#include "src/lib/scene/scene.h"
 
 #include "src/lib/debug/instrumentor.h"
 
@@ -32,6 +37,7 @@
 #include "src/lib/renderer/texture.h"
 #include "src/lib/renderer/vertex_array.h"
 #include "src/lib/renderer/orthographic_camera.h"
+#include "src/lib/renderer/perspective_camera.h"
 // -----------------------------------
 
 #endif // MAJKT_ENGINE_H_

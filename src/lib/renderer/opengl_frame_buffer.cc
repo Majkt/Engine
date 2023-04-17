@@ -8,6 +8,8 @@
 
 namespace majkt {
 
+	static const uint32_t kmax_framebuffer_size_{8192};
+
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec)
 		: specification_(spec)
 	{
@@ -63,6 +65,11 @@ namespace majkt {
 
 	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 	{
+		if (width == 0 || height == 0 || width > kmax_framebuffer_size_ || height > kmax_framebuffer_size_)
+		{
+			LOG(INFO) << "Attempted to rezize framebuffer to " << width << " " << height;
+			return;
+		}
 		specification_.Width = width;
 		specification_.Height = height;
 

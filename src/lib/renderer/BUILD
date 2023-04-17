@@ -16,3 +16,11 @@ cc_library(
     ],
     data = ["//src/sandbox:assets"]
 )
+
+load("//tools:cpplint.bzl", "cpplint")
+
+exports_files([
+    "CPPLINT.cfg",
+])
+
+cpplint()
