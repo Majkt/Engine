@@ -37,6 +37,8 @@ namespace majkt {
 		glm::vec3 Position;
 		glm::vec4 Color;
 		glm::vec2 TexCoord;
+		float TexIndex;
+		float TilingFactor;
 	};
 
 	struct Renderer2DData
@@ -44,6 +46,7 @@ namespace majkt {
 		const uint32_t MaxQuads = 10000;
 		const uint32_t MaxVertices = MaxQuads * 4;
 		const uint32_t MaxIndices = MaxQuads * 6;
+		static const uint32_t MaxTextureSlots = 16;
 
 		std::shared_ptr<VertexArray> QuadVertexArray;
 		std::shared_ptr<VertexBuffer> QuadVertexBuffer;
@@ -53,6 +56,8 @@ namespace majkt {
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
+		std::array<std::shared_ptr<Texture2D>, MaxTextureSlots> TextureSlots;
+		uint32_t TextureSlotIndex = 1; // 0 = white texture
 	};
 
 	static Renderer2DData data_;
@@ -66,7 +71,9 @@ namespace majkt {
 		data_.QuadVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "array_position_" },
 			{ ShaderDataType::Float4, "array_color_" },
-			{ ShaderDataType::Float2, "array_texture_coord_" }
+			{ ShaderDataType::Float2, "array_texture_coord_" },
+			{ ShaderDataType::Float,  "array_texture_index_" },
+			{ ShaderDataType::Float,  "array_tiling_factor_" }
 		});
 		data_.QuadVertexArray->AddVertexBuffer(data_.QuadVertexBuffer);
 
@@ -96,9 +103,16 @@ namespace majkt {
 		uint32_t whiteTextureData = 0xffffffff;
 		data_.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
+		int32_t samplers[data_.MaxTextureSlots];
+		for (uint32_t i = 0; i < data_.MaxTextureSlots; i++)
+			samplers[i] = i;
+
         data_.TextureShader = Shader::Create(get_current_dir() + "/src/sandbox/assets/shaders/Texture.glsl");
 		data_.TextureShader->Bind();
-		data_.TextureShader->SetInt("texture_", 0);
+		data_.TextureShader->SetIntArray("uniform_textures_", samplers, data_.MaxTextureSlots);
+
+		// Set all texture slots to 0
+		data_.TextureSlots[0] = data_.WhiteTexture;
     }
 
 	void Renderer2D::Shutdown()
@@ -114,6 +128,8 @@ namespace majkt {
 
 		data_.QuadIndexCount = 0;
 		data_.QuadVertexBufferPtr = data_.QuadVertexBufferBase;
+
+		data_.TextureSlotIndex = 1;
     }
 
 	void Renderer2D::EndScene()
@@ -127,6 +143,9 @@ namespace majkt {
 
 	void Renderer2D::Flush()
 	{
+		for (uint32_t i = 0; i < data_.TextureSlotIndex; i++)
+			data_.TextureSlots[i]->Bind(i);
+
 		RenderCommand::DrawIndexed(data_.QuadVertexArray, data_.QuadIndexCount);
 	}
 
@@ -139,24 +158,35 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 
+		const float texIndex = 0.0f; // White Texture
+		const float tilingFactor = 1.0f;
+
 		data_.QuadVertexBufferPtr->Position = position;
 		data_.QuadVertexBufferPtr->Color = color;
 		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+		data_.QuadVertexBufferPtr->TexIndex = texIndex;
+		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
 		data_.QuadVertexBufferPtr++;
 
 		data_.QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f };
 		data_.QuadVertexBufferPtr->Color = color;
 		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+		data_.QuadVertexBufferPtr->TexIndex = texIndex;
+		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
 		data_.QuadVertexBufferPtr++;
 
 		data_.QuadVertexBufferPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
 		data_.QuadVertexBufferPtr->Color = color;
 		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
+		data_.QuadVertexBufferPtr->TexIndex = texIndex;
+		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
 		data_.QuadVertexBufferPtr++;
 
 		data_.QuadVertexBufferPtr->Position = { position.x, position.y + size.y, 0.0f };
 		data_.QuadVertexBufferPtr->Color = color;
 		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+		data_.QuadVertexBufferPtr->TexIndex = texIndex;
+		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
 		data_.QuadVertexBufferPtr++;
 
 		data_.QuadIndexCount += 6;
@@ -178,6 +208,57 @@ namespace majkt {
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 	{
 		MAJKT_PROFILE_FUNCTION();
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		float textureIndex = 0.0f;
+		for (uint32_t i = 1; i < data_.TextureSlotIndex; i++)
+		{
+			if (*data_.TextureSlots[i].get() == *texture.get())
+			{
+				textureIndex = (float)i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0.0f)
+		{
+			textureIndex = (float)data_.TextureSlotIndex;
+			data_.TextureSlots[data_.TextureSlotIndex] = texture;
+			data_.TextureSlotIndex++;
+		}
+
+		data_.QuadVertexBufferPtr->Position = position;
+		data_.QuadVertexBufferPtr->Color = color;
+		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
+		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		data_.QuadVertexBufferPtr++;
+
+		data_.QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f };
+		data_.QuadVertexBufferPtr->Color = color;
+		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
+		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		data_.QuadVertexBufferPtr++;
+
+		data_.QuadVertexBufferPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
+		data_.QuadVertexBufferPtr->Color = color;
+		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
+		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
+		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		data_.QuadVertexBufferPtr++;
+
+		data_.QuadVertexBufferPtr->Position = { position.x, position.y + size.y, 0.0f };
+		data_.QuadVertexBufferPtr->Color = color;
+		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
+		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		data_.QuadVertexBufferPtr++;
+
+		data_.QuadIndexCount += 6;
+
+#if OLD_PATH
 		data_.TextureShader->SetFloat4("uniform_color_", tintColor);
 		data_.TextureShader->SetFloat("uniform_tiling_factor_", tilingFactor);
 		texture->Bind();
@@ -188,7 +269,8 @@ namespace majkt {
 
 		data_.QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(data_.QuadVertexArray);
-		}
+#endif
+	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{

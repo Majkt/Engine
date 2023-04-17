@@ -12,6 +12,7 @@ void Sandbox2D::OnAttach()
 {
 	MAJKT_PROFILE_FUNCTION();
 	checker_board_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/Checkerboard.png");
+	style_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/style.png");
 }
 
 void Sandbox2D::OnDetach()
@@ -39,6 +40,8 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
 		// majkt::Renderer2D::DrawRotatedQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, glm::radians(-45.0f), left_square_color_);
 		majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, left_square_color_);
 		majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, right_square_color_);
+		majkt::Renderer2D::DrawQuad({ -5.0f, -5.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0);
+		majkt::Renderer2D::DrawQuad({ -0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f }, checker_board_texture_, 20.0f);
 		// majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0f);
 		majkt::Renderer2D::EndScene();
 	}}
