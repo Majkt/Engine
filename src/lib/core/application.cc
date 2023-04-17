@@ -79,9 +79,9 @@ namespace majkt
 		dispatcher.Dispatch<WindowResizeEvent>(absl::bind_front(&Application::OnWindowResize, this));
 		for (auto it = layer_stack_.rbegin(); it != layer_stack_.rend(); ++it)
 		{
-			(*it)->OnEvent(e);
 			if (e.handled_)
 				break;
+			(*it)->OnEvent(e);
 		}
 	}
 

@@ -18,7 +18,8 @@ namespace majkt {
 
 		void OnAttach() override;
 		void OnDetach() override;
-
+		virtual void OnEvent(Event& e) override;
+		
 		void Begin();
 		void End();
 	private:

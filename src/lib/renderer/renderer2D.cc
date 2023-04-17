@@ -86,7 +86,7 @@ namespace majkt {
 		uint32_t* quadIndices = new uint32_t[data_.MaxIndices];
 
 		uint32_t offset = 0;
-		for (uint32_t i = 0; i < data_.MaxIndices; i += 6)
+		for (uint32_t i{0}; i < data_.MaxIndices; i += 6)
 		{
 			quadIndices[i + 0] = offset + 0;
 			quadIndices[i + 1] = offset + 1;
@@ -108,7 +108,7 @@ namespace majkt {
 		data_.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
 		int32_t samplers[data_.MaxTextureSlots];
-		for (uint32_t i = 0; i < data_.MaxTextureSlots; i++)
+		for (uint32_t i{0}; i < data_.MaxTextureSlots; i++)
 			samplers[i] = i;
 
         data_.TextureShader = Shader::Create(get_current_dir() + "/src/sandbox/assets/shaders/Texture.glsl");
@@ -127,6 +127,8 @@ namespace majkt {
 	void Renderer2D::Shutdown()
 	{
 		MAJKT_PROFILE_FUNCTION();
+
+		delete[] data_.QuadVertexBufferBase;
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
@@ -144,7 +146,7 @@ namespace majkt {
 	void Renderer2D::EndScene()
 	{
 		MAJKT_PROFILE_FUNCTION();
-		uint32_t dataSize = (uint8_t*)data_.QuadVertexBufferPtr - (uint8_t*)data_.QuadVertexBufferBase;
+		uint32_t dataSize = (uint32_t)((uint8_t*)data_.QuadVertexBufferPtr - (uint8_t*)data_.QuadVertexBufferBase );
 		data_.QuadVertexBuffer->SetData(data_.QuadVertexBufferBase, dataSize);
 
 		Flush();
@@ -152,7 +154,10 @@ namespace majkt {
 
 	void Renderer2D::Flush()
 	{
-		for (uint32_t i = 0; i < data_.TextureSlotIndex; i++)
+		if (data_.QuadIndexCount == 0)
+			return; 
+			
+		for (uint32_t i{0}; i < data_.TextureSlotIndex; ++i)
 			data_.TextureSlots[i]->Bind(i);
 
 		RenderCommand::DrawIndexed(data_.QuadVertexArray, data_.QuadIndexCount);
@@ -178,42 +183,27 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 
-		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
+		constexpr size_t quadVertexCount = 4;
 
 		const float textureIndex = 0.0f; // White Texture
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 		const float tilingFactor = 1.0f;
+
+		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
+			FlushAndReset();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[0];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[1];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[2];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[3];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
+		for (size_t i{0}; i < quadVertexCount; i++)
+		{
+			data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[i];
+			data_.QuadVertexBufferPtr->Color = color;
+			data_.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			data_.QuadVertexBufferPtr->TexIndex = textureIndex;
+			data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			data_.QuadVertexBufferPtr++;
+		}
 
 		data_.QuadIndexCount += 6;
 
@@ -229,10 +219,11 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 
+		constexpr size_t quadVertexCount = 4;
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+
 		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
 			FlushAndReset();
-
-		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < data_.TextureSlotIndex; i++)
@@ -246,6 +237,9 @@ namespace majkt {
 
 		if (textureIndex == 0.0f)
 		{
+			if (data_.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+				FlushAndReset();
+
 			textureIndex = (float)data_.TextureSlotIndex;
 			data_.TextureSlots[data_.TextureSlotIndex] = texture;
 			data_.TextureSlotIndex++;
@@ -254,33 +248,15 @@ namespace majkt {
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[0];	
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[1];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[2];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[3];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
+		for (size_t i{0}; i < quadVertexCount; i++)
+		{
+			data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[i];
+			data_.QuadVertexBufferPtr->Color = tintColor;
+			data_.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			data_.QuadVertexBufferPtr->TexIndex = textureIndex;
+			data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			data_.QuadVertexBufferPtr++;
+		}
 
 		data_.QuadIndexCount += 6;
 
@@ -296,43 +272,28 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 
-		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
+		constexpr size_t quadVertexCount = 4;
 
 		const float textureIndex = 0.0f; // White Texture
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 		const float tilingFactor = 1.0f;
+
+		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
+			FlushAndReset();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[0];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[1];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[2];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[3];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
+		for (size_t i{0}; i < quadVertexCount; i++)
+		{
+			data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[i];
+			data_.QuadVertexBufferPtr->Color = color;
+			data_.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			data_.QuadVertexBufferPtr->TexIndex = textureIndex;
+			data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			data_.QuadVertexBufferPtr++;
+		}
 
 		data_.QuadIndexCount += 6;
 
@@ -348,10 +309,11 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 
+		constexpr size_t quadVertexCount = 4;
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+
 		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
 			FlushAndReset();
-
-		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < data_.TextureSlotIndex; i++)
@@ -365,6 +327,9 @@ namespace majkt {
 
 		if (textureIndex == 0.0f)
 		{
+			if (data_.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+				FlushAndReset();
+
 			textureIndex = (float)data_.TextureSlotIndex;
 			data_.TextureSlots[data_.TextureSlotIndex] = texture;
 			data_.TextureSlotIndex++;
@@ -374,33 +339,15 @@ namespace majkt {
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[0];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[1];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[2];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
-
-		data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[3];
-		data_.QuadVertexBufferPtr->Color = color;
-		data_.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		data_.QuadVertexBufferPtr->TexIndex = textureIndex;
-		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		data_.QuadVertexBufferPtr++;
+		for (size_t i{0}; i < quadVertexCount; i++)
+		{
+			data_.QuadVertexBufferPtr->Position = transform * data_.QuadVertexPositions[i];
+			data_.QuadVertexBufferPtr->Color = tintColor;
+			data_.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			data_.QuadVertexBufferPtr->TexIndex = textureIndex;
+			data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			data_.QuadVertexBufferPtr++;
+		}
 
 		data_.QuadIndexCount += 6;
 		data_.Stats.QuadCount++;
