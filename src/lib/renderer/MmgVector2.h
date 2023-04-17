@@ -6,8 +6,6 @@
 
 namespace majkt {
 
-namespace majkt {
-
 class MmgVector2
 {
     public:
