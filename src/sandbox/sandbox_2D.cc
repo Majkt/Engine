@@ -28,6 +28,7 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
 	camera_controller_.OnUpdate(ts);
 
 	// Render
+	majkt::Renderer2D::ResetStats();
 	{
 		MAJKT_PROFILE_SCOPE("Renderer Prep");
 		majkt::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
@@ -43,9 +44,20 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
 		majkt::Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
 		majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, left_square_color_);
 		majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, right_square_color_);
-		majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0f);
+		majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, checker_board_texture_, 10.0f);
 		majkt::Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, rotation, style_texture_, 20.0f);
 		majkt::Renderer2D::EndScene();
+
+		// majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
+		// for (float y = -5.0f; y < 5.0f; y += 0.5f)
+		// {
+		// 	for (float x = -5.0f; x < 5.0f; x += 0.5f)
+		// 	{
+		// 		glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+		// 		majkt::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
+		// 	}
+		// }
+		// majkt::Renderer2D::EndScene();
 	}}
 
 void Sandbox2D::OnImGuiRender()
@@ -53,6 +65,13 @@ void Sandbox2D::OnImGuiRender()
 	MAJKT_PROFILE_FUNCTION();
 
 	ImGui::Begin("Settings");
+	auto stats = majkt::Renderer2D::GetStats();
+	ImGui::Text("Renderer2D Stats:");
+	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+	ImGui::Text("Quads: %d", stats.QuadCount);
+	ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+	ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
 	ImGui::ColorEdit4("Left Square Color", glm::value_ptr(left_square_color_));
 	ImGui::ColorEdit4("Right Square Color", glm::value_ptr(right_square_color_));
 

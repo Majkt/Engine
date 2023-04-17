@@ -43,9 +43,9 @@ namespace majkt {
 
 	struct Renderer2DData
 	{
-		const uint32_t MaxQuads = 10000;
-		const uint32_t MaxVertices = MaxQuads * 4;
-		const uint32_t MaxIndices = MaxQuads * 6;
+		static const uint32_t MaxQuads = 10000;
+		static const uint32_t MaxVertices = MaxQuads * 4;
+		static const uint32_t MaxIndices = MaxQuads * 6;
 		static const uint32_t MaxTextureSlots = 16;
 
 		std::shared_ptr<VertexArray> QuadVertexArray;
@@ -60,6 +60,8 @@ namespace majkt {
 		uint32_t TextureSlotIndex = 1; // 0 = white texture
 
 		glm::vec4 QuadVertexPositions[4];
+
+		Renderer2D::Statistics Stats;
 	};
 
 	static Renderer2DData data_;
@@ -154,6 +156,17 @@ namespace majkt {
 			data_.TextureSlots[i]->Bind(i);
 
 		RenderCommand::DrawIndexed(data_.QuadVertexArray, data_.QuadIndexCount);
+		data_.Stats.DrawCalls++;
+	}
+
+	void Renderer2D::FlushAndReset()
+	{
+		EndScene();
+
+		data_.QuadIndexCount = 0;
+		data_.QuadVertexBufferPtr = data_.QuadVertexBufferBase;
+
+		data_.TextureSlotIndex = 1;
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -164,6 +177,9 @@ namespace majkt {
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		MAJKT_PROFILE_FUNCTION();
+
+		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
+			FlushAndReset();
 
 		const float textureIndex = 0.0f; // White Texture
 		const float tilingFactor = 1.0f;
@@ -200,6 +216,8 @@ namespace majkt {
 		data_.QuadVertexBufferPtr++;
 
 		data_.QuadIndexCount += 6;
+
+		data_.Stats.QuadCount++;
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
@@ -210,6 +228,9 @@ namespace majkt {
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 	{
 		MAJKT_PROFILE_FUNCTION();
+
+		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
+			FlushAndReset();
 
 		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -262,6 +283,8 @@ namespace majkt {
 		data_.QuadVertexBufferPtr++;
 
 		data_.QuadIndexCount += 6;
+
+		data_.Stats.QuadCount++;
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
@@ -272,6 +295,9 @@ namespace majkt {
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
 		MAJKT_PROFILE_FUNCTION();
+
+		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
+			FlushAndReset();
 
 		const float textureIndex = 0.0f; // White Texture
 		const float tilingFactor = 1.0f;
@@ -309,6 +335,8 @@ namespace majkt {
 		data_.QuadVertexBufferPtr++;
 
 		data_.QuadIndexCount += 6;
+
+		data_.Stats.QuadCount++;
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
@@ -319,6 +347,9 @@ namespace majkt {
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 	{
 		MAJKT_PROFILE_FUNCTION();
+
+		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
+			FlushAndReset();
 
 		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -371,6 +402,18 @@ namespace majkt {
 		data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
 		data_.QuadVertexBufferPtr++;
 
-		data_.QuadIndexCount += 6;	}
+		data_.QuadIndexCount += 6;
+		data_.Stats.QuadCount++;
+	}
+
+	void Renderer2D::ResetStats()
+	{
+		memset(&data_.Stats, 0, sizeof(Statistics));
+	}
+
+	Renderer2D::Statistics Renderer2D::GetStats()
+	{
+		return data_.Stats;
+	}
 
 }
