@@ -2,7 +2,9 @@
 #define MAJKT_PLATFORM_MACOS_WINDOW_H_
 
 #include "src/lib/core/window.h"
+#include "src/lib/renderer/graphics_context.h"
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <string>
@@ -24,11 +26,15 @@ namespace majkt {
 		inline void SetEventCallback(const EventCallbackFn& callback) override { data_.event_callback_ = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+
+		void* GetNativeWindow() const override { return window_; }
 	private:
+	  	// Used in constructor for initializations
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 	private:
 		GLFWwindow* window_;
+		std::unique_ptr<GraphicsContext> context_;
 
 		struct WindowData
 		{

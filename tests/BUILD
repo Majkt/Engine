@@ -4,7 +4,7 @@ cc_test(
     name = "unittests",
     srcs = ["unittests.cc"],
     deps = [
-        "//src/lib:CPPLib",
+        "//src/lib:engine",
         "@com_google_googletest//:gtest_main",
     ],
 )

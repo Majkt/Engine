@@ -9,13 +9,12 @@
 
 namespace majkt {
 
-// Enum defined to filter events based on category.
 enum class EventType
 {
     kNone = 0,
     kWindowClose, kWindowResize, kWindowFocus, kWindowLostFocus, kWindowMoved,
     kAppTick, kAppUpdate, kAppRender,
-    kKeyPressed, kKeyReleased,
+    kKeyPressed, kKeyReleased, KeyTyped,
     kMouseButtonPressed, kMouseButtonReleased, kMouseMoved, kMouseScrolled,
 };
 
@@ -37,7 +36,7 @@ enum EventCategory
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
 
-class MAJKT_BASE_EXPORT Event
+class Event
 {
     friend class EventDispatcher;
     public:
@@ -50,25 +49,23 @@ class MAJKT_BASE_EXPORT Event
         {
             return GetCategoryFlags() & category;
         }
-    protected:
         // Check if the event has been handled.
-        bool event_handled_ = false;
+        bool handled_ = false;
 };
 
 class EventDispatcher
 {
-    template<typename T>
-    using EventFn = std::function<bool(T&)>;
     public:
         EventDispatcher(Event& event)
             : event_(event) {}
 
-        template<typename T>
-        bool Dispatch(EventFn<T> func)
+		// F will be deduced by the compiler
+		template<typename T, typename F>
+		bool Dispatch(const F& func)
         {
             if (event_.GetEventType() == T::GetStaticType())
             {
-                event_.event_handled_ = func(*(T*)&event_);
+                event_.handled_ = func(static_cast<T&>(event_));
                 return true;
             }
             return false;

@@ -6,7 +6,7 @@
 #include <sstream>
 
 namespace majkt {
-class MAJKT_BASE_EXPORT MouseMovedEvent : public Event
+class MouseMovedEvent : public Event
 {
     public:
         MouseMovedEvent(float x, float y)
@@ -23,12 +23,12 @@ class MAJKT_BASE_EXPORT MouseMovedEvent : public Event
         }
 
         EVENT_CLASS_TYPE(kMouseMoved)
-        EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryMouse |EventCategory:: kEventCategoryInput)
+        EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryMouse | EventCategory:: kEventCategoryInput)
     private:
         float mouseX_, mouseY_;
 };
 
-class MAJKT_BASE_EXPORT MouseScrolledEvent : public Event
+class MouseScrolledEvent : public Event
 {
     public:
         MouseScrolledEvent(float xOffset, float yOffset)
@@ -50,7 +50,7 @@ class MAJKT_BASE_EXPORT MouseScrolledEvent : public Event
         float x_offset_, y_offset_;
 };
 
-class MAJKT_BASE_EXPORT MouseButtonEvent : public Event
+class MouseButtonEvent : public Event
 {
     public:
         inline int GetMouseButton() const { return button_; }
@@ -63,7 +63,7 @@ class MAJKT_BASE_EXPORT MouseButtonEvent : public Event
         int button_;
 };
 
-class MAJKT_BASE_EXPORT MouseButtonPressedEvent : public MouseButtonEvent
+class MouseButtonPressedEvent : public MouseButtonEvent
 {
     public:
         MouseButtonPressedEvent(int button)
@@ -79,7 +79,7 @@ class MAJKT_BASE_EXPORT MouseButtonPressedEvent : public MouseButtonEvent
         EVENT_CLASS_TYPE(kMouseButtonPressed)
 };
 
-class MAJKT_BASE_EXPORT MouseButtonReleasedEvent : public MouseButtonEvent
+class MouseButtonReleasedEvent : public MouseButtonEvent
 {
     public:
         MouseButtonReleasedEvent(int button)

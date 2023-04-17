@@ -1,0 +1,21 @@
+diff a/src/lib/platform/windows/windows_window.cc b/src/lib/platform/windows/windows_window.cc	(rejected hunks)
+@@ -21,16 +22,19 @@ namespace majkt {
+ 
+ 	WindowsWindow::WindowsWindow(const WindowProps& props)
+ 	{
++		MAJKT_PROFILE_FUNCTION();
+ 		Init(props);
+ 	}
+ 
+ 	WindowsWindow::~WindowsWindow()
+ 	{
++		MAJKT_PROFILE_FUNCTION();
+ 		Shutdown();
+ 	}
+ 
+ 	void WindowsWindow::Init(const WindowProps& props)
+ 	{
++		MAJKT_PROFILE_FUNCTION();
+ 		data_.title_ = props.title_;
+ 		data_.width_ = props.width_;
+ 		data_.height_ = props.height_;

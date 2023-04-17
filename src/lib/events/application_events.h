@@ -7,7 +7,7 @@
 
 namespace majkt {
 
-class MAJKT_BASE_EXPORT WindowResizeEvent : public Event
+class WindowResizeEvent : public Event
 {
     public:
         WindowResizeEvent(unsigned int width, unsigned int height)
@@ -29,37 +29,37 @@ class MAJKT_BASE_EXPORT WindowResizeEvent : public Event
         unsigned int width_, height_;
 };
 
-class MAJKT_BASE_EXPORT WindowCloseEvent : public Event
+class WindowCloseEvent : public Event
 {
     public:
-        WindowCloseEvent() {}
+		WindowCloseEvent() = default;
 
         EVENT_CLASS_TYPE(kWindowClose)
         EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryApplication)
 };
 
-class MAJKT_BASE_EXPORT AppTickEvent : public Event
+class AppTickEvent : public Event
 {
     public:
-        AppTickEvent() {}
+        AppTickEvent() = default;
 
         EVENT_CLASS_TYPE(kAppTick)
         EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryApplication)
 };
 
-class MAJKT_BASE_EXPORT AppUpdateEvent : public Event
+class AppUpdateEvent : public Event
 {
     public:
-        AppUpdateEvent() {}
+        AppUpdateEvent() = default;
 
         EVENT_CLASS_TYPE(kAppUpdate)
         EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryApplication)
 };
 
-class MAJKT_BASE_EXPORT AppRenderEvent : public Event
+class AppRenderEvent : public Event
 {
     public:
-        AppRenderEvent() {}
+        AppRenderEvent() = default;
 
         EVENT_CLASS_TYPE(kAppRender)
         EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryApplication)
