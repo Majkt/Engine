@@ -1,0 +1,14 @@
+diff a/src/sandbox/sandbox_2D.cc b/src/sandbox/sandbox_2D.cc	(rejected hunks)
+@@ -36,9 +36,10 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
+ 	{
+ 		MAJKT_PROFILE_SCOPE("Renderer Draw");
+ 		majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
+-		majkt::Renderer2D::DrawRotatedQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, glm::radians(-45.0f), left_square_color_);
++		// majkt::Renderer2D::DrawRotatedQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, glm::radians(-45.0f), left_square_color_);
++		majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, left_square_color_);
+ 		majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, right_square_color_);
+-		majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0f);
++		// majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0f);
+ 		majkt::Renderer2D::EndScene();
+ 	}}
+ 

@@ -1,0 +1,9 @@
+diff a/src/lib/core/application.cc b/src/lib/core/application.cc	(rejected hunks)
+@@ -24,7 +24,6 @@ namespace majkt
+ 		instance_ = this;
+ 		window_ = Window::Create();
+ 		window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));
+-		
+ 		Renderer::Init();
+ 
+ 		imgui_layer_ = new ImGuiLayer();

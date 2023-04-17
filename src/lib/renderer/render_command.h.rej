@@ -1,0 +1,13 @@
+diff a/src/lib/renderer/render_command.h b/src/lib/renderer/render_command.h	(rejected hunks)
+@@ -28,9 +28,9 @@ namespace majkt {
+ 			renderer_api_->Clear();
+ 		}
+ 
+-		inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray)
++		inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, uint32_t count = 0)
+ 		{
+-			renderer_api_->DrawIndexed(vertexArray);
++			renderer_api_->DrawIndexed(vertexArray, count);
+ 		}
+ 	private:
+ 		static std::unique_ptr<RendererAPI> renderer_api_;

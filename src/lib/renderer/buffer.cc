@@ -9,6 +9,18 @@
 
 namespace majkt {
 
+	std::shared_ptr<VertexBuffer> VertexBuffer::Create(uint32_t size)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::API::None:    LOG(WARNING) << "RendererAPI::None is currently not supported!"; return nullptr;
+			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLVertexBuffer>(size);
+		}
+
+		LOG(WARNING) << "Unknown RendererAPI!";
+		return nullptr;
+	}
+
 	std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())

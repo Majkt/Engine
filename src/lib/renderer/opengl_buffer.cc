@@ -5,6 +5,14 @@
 
 namespace majkt {
 
+	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
+	{
+		MAJKT_PROFILE_FUNCTION();
+		glGenBuffers(1, &renderer_id_);
+		glBindBuffer(GL_ARRAY_BUFFER, renderer_id_);
+		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+	}
+
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size)
 	{
 		MAJKT_PROFILE_FUNCTION();
@@ -29,6 +37,12 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	void OpenGLVertexBuffer::SetData(const void* data, uint32_t size)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, renderer_id_);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
 

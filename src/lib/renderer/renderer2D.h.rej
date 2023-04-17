@@ -1,0 +1,11 @@
+diff a/src/lib/renderer/renderer2D.h b/src/lib/renderer/renderer2D.h	(rejected hunks)
+@@ -15,7 +15,8 @@ namespace majkt {
+ 
+ 		static void BeginScene(const OrthographicCamera& camera);
+ 		static void EndScene();
+-
++		static void Flush();
++		
+ 		// Primitives
+ 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
+ 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);

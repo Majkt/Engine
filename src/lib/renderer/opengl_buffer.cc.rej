@@ -1,0 +1,29 @@
+diff a/src/lib/renderer/opengl_buffer.cc b/src/lib/renderer/opengl_buffer.cc	(rejected hunks)
+@@ -5,6 +5,14 @@
+ 
+ namespace majkt {
+ 
++	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
++	{
++		MAJKT_PROFILE_FUNCTION();
++		glGenBuffers(1, &renderer_id_);
++		glBindBuffer(GL_ARRAY_BUFFER, renderer_id_);
++		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
++	}
++
+ 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size)
+ 	{
+ 		MAJKT_PROFILE_FUNCTION();
+@@ -31,6 +39,12 @@ namespace majkt {
+ 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+ 	}
+ 
++	void OpenGLVertexBuffer::SetData(const void* data, uint32_t size)
++	{
++		glBindBuffer(GL_ARRAY_BUFFER, renderer_id_);
++		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
++	}
++
+ 
+ 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
+ 		: count_(count)

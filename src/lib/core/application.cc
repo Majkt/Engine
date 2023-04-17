@@ -24,7 +24,6 @@ namespace majkt
 		instance_ = this;
 		window_ = Window::Create();
 		window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));
-		
 		Renderer::Init();
 
 		imgui_layer_ = new ImGuiLayer();
