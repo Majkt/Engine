@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	app->Run();
 	MAJKT_PROFILE_END_SESSION();
 
-	MAJKT_PROFILE_BEGIN_SESSION("Startup", get_current_dir() + "/src/sandbox/MajktProfile-Shutdown.json");
+	MAJKT_PROFILE_BEGIN_SESSION("Shutdown", get_current_dir() + "/src/sandbox/MajktProfile-Shutdown.json");
 	delete app;
 	MAJKT_PROFILE_END_SESSION();
 	LOG(INFO) << "---------------  Majkt Engine Ended  ---------------";

@@ -63,6 +63,12 @@ namespace majkt {
 		dispatcher.Dispatch<WindowResizeEvent>(absl::bind_front(&OrthographicCameraController::OnWindowResized, this));
 	}
 
+	void OrthographicCameraController::OnResize(float width, float height)
+	{
+		aspect_ratio_ = width / height;
+		camera_.SetProjection(-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_);
+	}
+
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
 		MAJKT_PROFILE_FUNCTION();
@@ -75,8 +81,8 @@ namespace majkt {
 	bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& e)
 	{
 		MAJKT_PROFILE_FUNCTION();
-		aspect_ratio_ = (float)e.GetWidth() / (float)e.GetHeight();
-		camera_.SetProjection(-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_);
+
+		OnResize((float)e.GetWidth(), (float)e.GetHeight());
 		return false;
 	}
 

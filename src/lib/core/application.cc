@@ -14,15 +14,15 @@ namespace majkt
 {
 	Application* Application::instance_ = nullptr;
 
-    Application::Application()
-    {
+	Application::Application(const std::string& name)
+	{
 		MAJKT_PROFILE_FUNCTION();
 
 		if (instance_){
 			LOG(WARNING) << instance_ <<  " Application already exists!";
 		}
 		instance_ = this;
-		window_ = Window::Create();
+		window_ = Window::Create(WindowProps(name));
 		window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));
 		
 		Renderer::Init();
@@ -38,6 +38,11 @@ namespace majkt
 		Renderer::Shutdown();
 	}
 	
+	void Application::Close()
+	{
+		running_ = false;
+	}
+
     void Application::Run()
     {
 		MAJKT_PROFILE_FUNCTION();

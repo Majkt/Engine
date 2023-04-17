@@ -7,7 +7,7 @@ filegroup(
 )
 
 cc_binary(
-    name = "sandbox_app",
+    name = "majkt_editor",
     srcs = glob(["*.cc", "*.h"]),
     deps = [
         "//src/lib:engine", 

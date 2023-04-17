@@ -15,9 +15,10 @@ namespace majkt
 	class Application
 	{
 	public:
-		Application();
+		Application(const std::string& name = "Majkt App");
 		virtual ~Application();
 
+		void Close();
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);

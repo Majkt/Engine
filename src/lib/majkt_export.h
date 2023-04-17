@@ -28,6 +28,7 @@
 #include "src/lib/renderer/render_command.h"
 #include "src/lib/renderer/buffer.h"
 #include "src/lib/renderer/shader.h"
+#include "src/lib/renderer/frame_buffer.h"
 #include "src/lib/renderer/texture.h"
 #include "src/lib/renderer/vertex_array.h"
 #include "src/lib/renderer/orthographic_camera.h"
