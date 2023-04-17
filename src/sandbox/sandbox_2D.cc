@@ -35,14 +35,16 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
 	}
 
 	{
+		static float rotation{0.0f};
+		rotation += ts * 50.0f;
+
 		MAJKT_PROFILE_SCOPE("Renderer Draw");
 		majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
-		// majkt::Renderer2D::DrawRotatedQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, glm::radians(-45.0f), left_square_color_);
+		majkt::Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
 		majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, left_square_color_);
 		majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, right_square_color_);
-		majkt::Renderer2D::DrawQuad({ -5.0f, -5.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0);
-		majkt::Renderer2D::DrawQuad({ -0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f }, checker_board_texture_, 20.0f);
-		// majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0f);
+		majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0f);
+		majkt::Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, rotation, style_texture_, 20.0f);
 		majkt::Renderer2D::EndScene();
 	}}
 
