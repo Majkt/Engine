@@ -26,6 +26,7 @@ namespace majkt {
 		std::shared_ptr<Framebuffer> frame_buffer_;
 
 		std::shared_ptr<Texture2D> checker_board_texture_, style_texture_;
+		bool viewport_focused_ = false, viewport_hovered_ = false;
 		glm::vec2 viewport_size_ = { 0.0f, 0.0f };
 
 		glm::vec4 square_color_ = { 0.2f, 0.3f, 0.8f, 1.0f };

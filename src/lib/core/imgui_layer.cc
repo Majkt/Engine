@@ -82,9 +82,12 @@ namespace majkt {
 
 	void ImGuiLayer::OnEvent(Event& e)
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		e.handled_ |= e.IsInCategory(kEventCategoryMouse) & io.WantCaptureMouse;
-		e.handled_ |= e.IsInCategory(kEventCategoryKeyboard) & io.WantCaptureKeyboard;
+		if (block_events_)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			e.handled_ |= e.IsInCategory(kEventCategoryMouse) & io.WantCaptureMouse;
+			e.handled_ |= e.IsInCategory(kEventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
 	}
 
 	void ImGuiLayer::Begin()

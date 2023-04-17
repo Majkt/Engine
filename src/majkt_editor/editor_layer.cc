@@ -34,8 +34,18 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 
+		// Resize
+		if (majkt::FramebufferSpecification spec = frame_buffer_->GetSpecification();
+			viewport_size_.x > 0.0f && viewport_size_.y > 0.0f && // zero sized framebuffer is invalid
+			(spec.Width != viewport_size_.x || spec.Height != viewport_size_.y))
+		{
+			frame_buffer_->Resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+			camera_controller_.OnResize(viewport_size_.x, viewport_size_.y);
+		}
+
 		// Update
-		camera_controller_.OnUpdate(ts);
+		if (viewport_focused_)
+			camera_controller_.OnUpdate(ts);
 
 		// Render
 		majkt::Renderer2D::ResetStats();
@@ -152,15 +162,14 @@ namespace majkt {
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		if (viewport_size_ != *((glm::vec2*)&viewportPanelSize))
-		{
-			frame_buffer_->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
-			viewport_size_ = { viewportPanelSize.x, viewportPanelSize.y };
 
-			camera_controller_.OnResize(viewportPanelSize.x, viewportPanelSize.y);
-		}
-		uint32_t textureID = frame_buffer_->GetColorAttachmentRendererID();
+		viewport_focused_ = ImGui::IsWindowFocused();
+		viewport_hovered_ = ImGui::IsWindowHovered();
+		Application::Get().GetImGuiLayer()->BlockEvents(!viewport_focused_ || !viewport_hovered_);
+
+		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		viewport_size_ = { viewportPanelSize.x, viewportPanelSize.y };
+        uint32_t textureID = frame_buffer_->GetColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, ImVec2{ viewport_size_.x, viewport_size_.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		ImGui::End();
 		ImGui::PopStyleVar();

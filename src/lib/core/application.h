@@ -23,6 +23,7 @@ namespace majkt
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 		inline Window& GetWindow() { return *window_; }
+		ImGuiLayer* GetImGuiLayer() { return imgui_layer_; }
 		inline static Application& Get() { return *instance_; }
 
 	private:
