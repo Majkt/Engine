@@ -4,7 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Sandbox2D::Sandbox2D()
-	: Layer("Sandbox2D"), camera_controller_(1280.0f / 720.0f)
+	: Layer("Sandbox2D"), camera_controller_(1280.0f / 720.0f, true)
 {
 }
 
@@ -36,9 +36,9 @@ void Sandbox2D::OnUpdate(majkt::Timestep ts)
 	{
 		MAJKT_PROFILE_SCOPE("Renderer Draw");
 		majkt::Renderer2D::BeginScene(camera_controller_.GetCamera());
-		majkt::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-		majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, { 0.2f, 0.3f, 0.8f, 1.0f });
-		majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_);
+		majkt::Renderer2D::DrawRotatedQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, glm::radians(-45.0f), left_square_color_);
+		majkt::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, right_square_color_);
+		majkt::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, checker_board_texture_, 10.0f);
 		majkt::Renderer2D::EndScene();
 	}}
 
@@ -47,7 +47,8 @@ void Sandbox2D::OnImGuiRender()
 	MAJKT_PROFILE_FUNCTION();
 
 	ImGui::Begin("Settings");
-	ImGui::ColorEdit4("Square Color", glm::value_ptr(square_color_));
+	ImGui::ColorEdit4("Left Square Color", glm::value_ptr(left_square_color_));
+	ImGui::ColorEdit4("Right Square Color", glm::value_ptr(right_square_color_));
 
 	ImGui::End();
 }

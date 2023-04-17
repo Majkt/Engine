@@ -102,6 +102,7 @@ namespace majkt {
 	{
 		MAJKT_PROFILE_FUNCTION();
 		data_->TextureShader->SetFloat4("uniform_color", color);
+		data_->TextureShader->SetFloat("uniform_tiling_factor_", 1.0f);
 		data_->WhiteTexture->Bind();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
@@ -111,18 +112,63 @@ namespace majkt {
 		RenderCommand::DrawIndexed(data_->QuadVertexArray);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture);
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 	{
 		MAJKT_PROFILE_FUNCTION();
-		data_->TextureShader->SetFloat4("uniform_color", glm::vec4(1.0f));
+		data_->TextureShader->SetFloat4("uniform_color", tintColor);
+		data_->TextureShader->SetFloat("uniform_tiling_factor", tilingFactor);
 		texture->Bind();
         
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		data_->TextureShader->SetMat4("transform_", transform);
+
+		data_->QuadVertexArray->Bind();
+		RenderCommand::DrawIndexed(data_->QuadVertexArray);
+	}
+
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, color);
+	}
+
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	{
+		MAJKT_PROFILE_FUNCTION();
+
+		data_->TextureShader->SetFloat4("uniform_color", color);
+		data_->TextureShader->SetFloat("uniform_tiling_factor", 1.0f);
+		data_->WhiteTexture->Bind();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		data_->TextureShader->SetMat4("transform_", transform);
+		data_->QuadVertexArray->Bind();
+		RenderCommand::DrawIndexed(data_->QuadVertexArray);
+	}
+
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilingFactor, tintColor);
+	}
+
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	{
+		MAJKT_PROFILE_FUNCTION();
+
+		data_->TextureShader->SetFloat4("uniform_color", tintColor);
+		data_->TextureShader->SetFloat("uniform_tiling_factor", tilingFactor);
+		texture->Bind();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		data_->TextureShader->SetMat4("transform_", transform);
 
 		data_->QuadVertexArray->Bind();
