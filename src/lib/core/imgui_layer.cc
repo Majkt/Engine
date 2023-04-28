@@ -4,6 +4,7 @@
 
 #include "imgui.h"
 #include "third_party/imgui/backends/imgui_impl_glfw.h"
+#include "third_party/imgui/imgui_internal.h"
 #include "third_party/imgui/backends/imgui_impl_opengl3.h"
 
 #include <glad/glad.h>
@@ -15,11 +16,61 @@
 #include "glog/stl_logging.h"
 #include <iostream>
 
+
 namespace majkt {
 
 	ImGuiLayer::ImGuiLayer()
 		: Layer("ImGuiLayer")
 	{
+	}
+
+	void ImGuiLayer::FlushIniToDisk()
+	{
+		ImGuiIO &io = ImGui::GetIO();
+		ImGui::SaveIniSettingsToDisk(io.IniFilename);
+	}
+
+	void ImGuiLayer::SetDefaultIniPath(bool flush, std::string path)
+	{
+		if (flush) FlushIniToDisk();
+
+		LOG(INFO) << get_current_dir();
+		if (!path.empty()) ini_file_path_ = path;
+		else ini_file_path_ = get_current_dir() + "/imgui.ini";
+		ImGuiIO &io = ImGui::GetIO();
+		io.IniFilename = ini_file_path_.c_str();
+
+		ImGui::ClearIniSettings();
+		ImGui::LoadIniSettingsFromDisk(io.IniFilename);
+	}
+
+	void ImGuiLayer::SetProjectIniPath( const std::string &project_uuid, bool flush )
+	{
+		if (flush) FlushIniToDisk();
+
+		LOG(INFO) << get_current_dir() ;
+		ini_file_path_ = get_current_dir()  + "/"+ project_uuid + ".ini";
+		ImGuiIO &io = ImGui::GetIO();
+		io.IniFilename = ini_file_path_.c_str();
+
+		ImGui::ClearIniSettings();
+		ImGui::LoadIniSettingsFromDisk(io.IniFilename);
+	}
+
+	void ImGuiLayer::SetIniPath(bool flush, std::string path, std::string project_uuid)
+	{
+		init_data_.flush_ = flush;
+		init_data_.path_ = path;
+		init_data_.project_uuid_ = project_uuid;
+		LOG(INFO) << init_data_.project_uuid_ << "   " << init_data_.flush_ << "   " << init_data_.path_;
+		if (!init_data_.project_uuid_.empty()) 
+		{
+			SetProjectIniPath(init_data_.project_uuid_, init_data_.flush_);
+		} else 
+		{
+			SetDefaultIniPath(init_data_.flush_, init_data_.path_);
+		}
+
 	}
 
 	void ImGuiLayer::OnAttach()
@@ -36,7 +87,7 @@ namespace majkt {
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 		//io.ConfigViewportsNoAutoMerge = true;
 		//io.ConfigViewportsNoTaskBarIcon = true;
-
+		
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
 		// ImGui::StyleColorsLight();

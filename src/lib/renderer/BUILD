@@ -14,7 +14,7 @@ cc_library(
         "//third_party/stb_image",
         "@com_google_absl//absl/functional:bind_front",
     ],
-    data = ["//src/sandbox:assets"]
+    data = ["//src/sandbox:assets", "//src/majkt_editor:assets"]
 )
 
 load("//tools:cpplint.bzl", "cpplint")

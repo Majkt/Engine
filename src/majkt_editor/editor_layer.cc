@@ -15,9 +15,10 @@ namespace majkt {
 	void EditorLayer::OnAttach()
 	{
 		MAJKT_PROFILE_FUNCTION();
+		Application::Get().GetImGuiLayer()->SetIniPath(false, get_current_dir() + "/src/majkt_editor/assets/imgui.ini");
 
-	    checker_board_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/Checkerboard.png");
-	    style_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/sandbox/assets/textures/style.png");
+	    checker_board_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/majkt_editor/assets/textures/Checkerboard.png");
+	    style_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/majkt_editor/assets/textures/style.png");
 
 		FramebufferSpecification fbSpec;
 		fbSpec.Width = 1280;
@@ -183,7 +184,7 @@ namespace majkt {
 		viewport_focused_ = ImGui::IsWindowFocused();
 		viewport_hovered_ = ImGui::IsWindowHovered();
 		Application::Get().GetImGuiLayer()->BlockEvents(!viewport_focused_ || !viewport_hovered_);
-
+		
 		ImVec2 viewportPanelSize{ImGui::GetContentRegionAvail()};
 		viewport_size_ = { viewportPanelSize.x, viewportPanelSize.y };
 		uint32_t textureID = framebuffer_->GetColorAttachmentRendererID();
