@@ -8,41 +8,8 @@
 
 namespace majkt {
 
-    static void DoMath(const glm::mat4& transform)
-	{
-
-	}
-
-	static void OnTransformConstruct(entt::registry& registry, entt::entity entity)
-	{
-
-	}
-
 	Scene::Scene()
 	{
-#if ENTT_EXAMPLE_CODE
-		entt::entity entity = registry_.create();
-		registry_.emplace<TransformComponent>(entity, glm::mat4(1.0f));
-
-		registry_.on_construct<TransformComponent>().connect<&OnTransformConstruct>();
-
-
-		if (registry_.has<TransformComponent>(entity))
-			TransformComponent& transform = registry_.get<TransformComponent>(entity);
-
-
-		auto view = registry_.view<TransformComponent>();
-		for (auto entity : view)
-		{
-			TransformComponent& transform = view.get<TransformComponent>(entity);
-		}
-
-		auto group = registry_.group<TransformComponent>(entt::get<MeshComponent>);
-		for (auto entity : group)
-		{
-			auto&[transform, mesh] = group.get<TransformComponent, MeshComponent>(entity);
-		}
-#endif
 	}
 
 	Scene::~Scene()
@@ -60,6 +27,21 @@ namespace majkt {
 
 	void Scene::OnUpdate(Timestep ts)
 	{
+		// Update scripts
+		{
+			registry_.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+			{
+				if (!nsc.Instance)
+				{
+					nsc.Instance = nsc.InstantiateScript();
+					nsc.Instance->entity_ = Entity{ entity, this };
+					nsc.Instance->OnCreate();
+				}
+
+				nsc.Instance->OnUpdate(ts);
+			});
+		}
+
 		// Render 2D
 		Camera* mainCamera = nullptr;
 		glm::mat4* cameraTransform = nullptr;

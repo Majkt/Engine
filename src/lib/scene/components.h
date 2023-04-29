@@ -2,6 +2,7 @@
 #define MAJKT_SCENE_COMPONENTS_H_
 
 #include "src/lib/scene/scene_camera.h"
+#include "src/lib/scene/scriptable_entity.h"
 
 #include <glm/glm.hpp>
 
@@ -50,6 +51,21 @@ namespace majkt {
 		CameraComponent(const CameraComponent&) = default;
 	};
 
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* Instance = nullptr;
+
+		ScriptableEntity*(*InstantiateScript)();
+		void (*DestroyScript)(NativeScriptComponent*);
+
+		template<typename T>
+		void Bind()
+		{
+			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
+		}
+	};
+	
 } // namespace majkt
 
 #endif  // MAJKT_SCENE_COMPONENTS_H_

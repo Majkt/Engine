@@ -15,22 +15,22 @@ namespace majkt {
 	void OrthographicCameraController::OnUpdate(Timestep ts)
 	{
 		MAJKT_PROFILE_FUNCTION();
-		if (Input::IsKeyPressed(MAJKT_KEY_A))
+		if (Input::IsKeyPressed(Key::A))
 		{
 			camera_position_.x -= cos(glm::radians(camera_rotation_)) * camera_translation_speed_ * ts;
 			camera_position_.y -= sin(glm::radians(camera_rotation_)) * camera_translation_speed_ * ts;
 		}
-		else if (Input::IsKeyPressed(MAJKT_KEY_D))
+		else if (Input::IsKeyPressed(Key::D))
 		{
 			camera_position_.x += cos(glm::radians(camera_rotation_)) * camera_translation_speed_ * ts;
 			camera_position_.y += sin(glm::radians(camera_rotation_)) * camera_translation_speed_ * ts;
 		}
-		if (Input::IsKeyPressed(MAJKT_KEY_W))
+		if (Input::IsKeyPressed(Key::W))
 		{
 			camera_position_.x += -sin(glm::radians(camera_rotation_)) * camera_translation_speed_ * ts;
 			camera_position_.y += cos(glm::radians(camera_rotation_)) * camera_translation_speed_ * ts;
 		}
-		else if (Input::IsKeyPressed(MAJKT_KEY_S))
+		else if (Input::IsKeyPressed(Key::S))
 		{
 			camera_position_.x -= -sin(glm::radians(camera_rotation_)) * camera_translation_speed_ * ts;
 			camera_position_.y -= cos(glm::radians(camera_rotation_)) * camera_translation_speed_ * ts;
@@ -38,9 +38,9 @@ namespace majkt {
 
 		if (rotation_)
 		{
-			if (Input::IsKeyPressed(MAJKT_KEY_Q))
+			if (Input::IsKeyPressed(Key::Q))
 				camera_rotation_ += camera_rotation_speed_ * ts;
-			if (Input::IsKeyPressed(MAJKT_KEY_E))
+			if (Input::IsKeyPressed(Key::E))
 				camera_rotation_ -= camera_rotation_speed_ * ts;
 			if (camera_rotation_ > 180.0f)
 				camera_rotation_ -= 360.0f;

@@ -95,7 +95,7 @@ namespace majkt {
 							ShaderDataTypeToOpenGLBaseType(element.Type),
 							element.Normalized ? GL_TRUE : GL_FALSE,
 							layout.GetStride(),
-							(const void*)(sizeof(float) * count * i));
+							(const void*)(element.Offset + sizeof(float) * count * i));
 						glVertexAttribDivisor(vertex_buffer_index_, 1);
 						vertex_buffer_index_++;
 					}

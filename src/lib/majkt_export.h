@@ -19,6 +19,7 @@
 #include "src/lib/scene/entity.h"
 #include "src/lib/scene/components.h"
 #include "src/lib/scene/scene.h"
+#include "src/lib/scene/scriptable_entity.h"
 
 #include "src/lib/debug/instrumentor.h"
 

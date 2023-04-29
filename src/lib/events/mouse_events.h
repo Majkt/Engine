@@ -1,15 +1,17 @@
 #ifndef MAJKT_MOUSE_EVENTS_H_
 #define MAJKT_MOUSE_EVENTS_H_
 
-#include "event.h"
+#include "src/lib/events/event.h"
+#include "src/lib/core/mouse_button_codes.h"
 
 #include <sstream>
+#include <memory>
 
 namespace majkt {
 class MouseMovedEvent : public Event
 {
     public:
-        MouseMovedEvent(float x, float y)
+        MouseMovedEvent(const float x, const float y)
             : mouseX_(x), mouseY_(y) {}
 
         inline float GetX() const { return mouseX_; }
@@ -31,7 +33,7 @@ class MouseMovedEvent : public Event
 class MouseScrolledEvent : public Event
 {
     public:
-        MouseScrolledEvent(float xOffset, float yOffset)
+        MouseScrolledEvent(const float xOffset, const float yOffset)
             : x_offset_(xOffset), y_offset_(yOffset) {}
 
         inline float GetXOffset() const { return x_offset_; }
@@ -53,11 +55,11 @@ class MouseScrolledEvent : public Event
 class MouseButtonEvent : public Event
 {
     public:
-        inline int GetMouseButton() const { return button_; }
+        MouseCode GetMouseButton() const { return button_; }
 
         EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryMouse | EventCategory::kEventCategoryInput)
     protected:
-        MouseButtonEvent(int button)
+        MouseButtonEvent(const int button)
             : button_(button) {}
 
         int button_;
@@ -66,7 +68,7 @@ class MouseButtonEvent : public Event
 class MouseButtonPressedEvent : public MouseButtonEvent
 {
     public:
-        MouseButtonPressedEvent(int button)
+        MouseButtonPressedEvent(const int button)
             : MouseButtonEvent(button) {}
 
         std::string ToString() const override
@@ -82,7 +84,7 @@ class MouseButtonPressedEvent : public MouseButtonEvent
 class MouseButtonReleasedEvent : public MouseButtonEvent
 {
     public:
-        MouseButtonReleasedEvent(int button)
+        MouseButtonReleasedEvent(const int button)
             : MouseButtonEvent(button) {}
 
         std::string ToString() const override

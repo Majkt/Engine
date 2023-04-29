@@ -4,6 +4,8 @@
 #include "src/lib/core/base_export.h"
 #include "src/lib/core/key_codes.h"
 #include "src/lib/core/mouse_button_codes.h"
+
+#include <glm/glm.hpp>
 #include <utility>
 
 namespace majkt
@@ -15,7 +17,7 @@ namespace majkt
 		static bool IsKeyPressed(KeyCode key);
 
 		static bool IsMouseButtonPressed(MouseCode button);
-		static std::pair<float, float> GetMousePosition();
+		static glm::vec2 GetMousePosition();
 		static float GetMouseX();
 		static float GetMouseY();
 	};

@@ -1,30 +1,33 @@
 #ifndef MAJKT_KEY_EVENTS_H_
 #define MAJKT_KEY_EVENTS_H_
 
-#include "event.h"
+#include "src/lib/events/event.h"
+#include "src/lib/core/key_codes.h"
+
 #include <sstream>
+#include <memory>
 
 namespace majkt {
 class KeyEvent : public Event
 {
     public:
-        inline int GetKeyCode() const { return key_code_; }
+        KeyCode GetKeyCode() const { return key_code_; }
 
         EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryKeyboard | EventCategory::kEventCategoryInput)
     protected:
-        KeyEvent(int keycode)
+        KeyEvent(const KeyCode keycode)
             : key_code_(keycode) {}
 
-        int key_code_;
+        KeyCode key_code_;
 };
 
 class KeyPressedEvent : public KeyEvent
 {
     public:
-        KeyPressedEvent(int keycode, int repeatCount)
+        KeyPressedEvent(const KeyCode keycode, const uint16_t repeatCount)
             : KeyEvent(keycode), repeat_count_(repeatCount) {}
 
-        inline int GetRepeatCount() const { return repeat_count_; }
+        uint16_t GetRepeatCount() const { return repeat_count_; }
 
         std::string ToString() const override
         {
@@ -35,13 +38,13 @@ class KeyPressedEvent : public KeyEvent
 
         EVENT_CLASS_TYPE(kKeyPressed)
     private:
-        int repeat_count_;
+        uint16_t repeat_count_;
 };
 
 class KeyReleasedEvent : public KeyEvent
 {
     public:
-        KeyReleasedEvent(int keycode)
+        KeyReleasedEvent(const KeyCode keycode)
             : KeyEvent(keycode) {}
 
         std::string ToString() const override
@@ -57,7 +60,7 @@ class KeyReleasedEvent : public KeyEvent
 class KeyTypedEvent : public KeyEvent
 {
 public:
-    KeyTypedEvent(int keycode)
+    KeyTypedEvent(const KeyCode keycode)
         : KeyEvent(keycode) {}
 
     std::string ToString() const override
@@ -69,6 +72,7 @@ public:
 
     EVENT_CLASS_TYPE(KeyTyped)
 };
+
 } // namespace majkt
 
 #endif  // MAJKT_KEY_EVENTS_H_
