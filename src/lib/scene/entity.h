@@ -23,7 +23,10 @@ namespace majkt {
 		T& AddComponent(Args&&... args)
 		{
             if (HasComponent<T>()) LOG(WARNING) << "Entity already has component!";
-			return scene_->registry_.emplace<T>(entity_handle_, std::forward<Args>(args)...);
+			T& component = scene_->registry_.emplace<T>(entity_handle_, std::forward<Args>(args)...);
+			scene_->OnComponentAdded<T>(*this, component);
+			return component;		
+			
 		}
 
 		template<typename T>
@@ -47,7 +50,18 @@ namespace majkt {
 		}
 
 		operator bool() const { return entity_handle_ != entt::null; }
-		
+		operator entt::entity() const { return entity_handle_; }
+		operator uint32_t() const { return (uint32_t)entity_handle_; }
+
+		bool operator==(const Entity& other) const
+		{
+			return entity_handle_ == other.entity_handle_ && scene_ == other.scene_;
+		}
+
+		bool operator!=(const Entity& other) const
+		{
+			return !(*this == other);
+		}
 		private:
 		entt::entity entity_handle_{entt::null};
 		Scene* scene_ = nullptr;

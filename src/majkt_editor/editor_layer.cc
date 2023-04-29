@@ -28,50 +28,57 @@ namespace majkt {
 		// Creates Scene
 		active_scene_ = std::make_shared<Scene>();
 
+
+#if 0
 		// Defines Entities
 		auto square = active_scene_->CreateEntity("Green Square");
 		square.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
 
+		auto redSquare = active_scene_->CreateEntity("Red Square");
+		redSquare.AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
+
 		square_entity_ = square;
 
-		camera_entity_ = active_scene_->CreateEntity("Camera Entity");
+		camera_entity_ = active_scene_->CreateEntity("Camera A");
 		camera_entity_.AddComponent<CameraComponent>();
 
-		second_camera_ = active_scene_->CreateEntity("Clip-Space Entity");
+		second_camera_ = active_scene_->CreateEntity("Camera B");
 		auto& cc = second_camera_.AddComponent<CameraComponent>();
 		cc.Primary = false;
 
 		class CameraController : public ScriptableEntity
 		{
 		public:
-			void OnCreate()
+			virtual void OnCreate() override
 			{
-				auto& transform = GetComponent<TransformComponent>().Transform;
-				transform[3][0] = rand() % 10 - 5.0f;
+				auto& translation = GetComponent<TransformComponent>().Translation;
+				translation.x = rand() % 10 - 5.0f;
 			}
 
-			void OnDestroy()
+			virtual void OnDestroy() override
 			{
 			}
 
-			void OnUpdate(Timestep ts)
+			virtual void OnUpdate(Timestep ts) override
 			{
-				auto& transform = GetComponent<TransformComponent>().Transform;
+				auto& translation = GetComponent<TransformComponent>().Translation;
 				float speed = 5.0f;
 
 				if (Input::IsKeyPressed(Key::A))
-					transform[3][0] -= speed * ts;
+					translation.x -= speed * ts;
 				if (Input::IsKeyPressed(Key::D))
-					transform[3][0] += speed * ts;
+					translation.x += speed * ts;
 				if (Input::IsKeyPressed(Key::W))
-					transform[3][1] += speed * ts;
+					translation.y += speed * ts;
 				if (Input::IsKeyPressed(Key::S))
-					transform[3][1] -= speed * ts;
+					translation.y -= speed * ts;
 			}
 		};
 
 		camera_entity_.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 		second_camera_.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+#endif
+		scene_hierarchy_panel_.SetContext(active_scene_);
 	}
 
 	void EditorLayer::OnDetach()
@@ -152,11 +159,16 @@ namespace majkt {
 
 		// DockSpace
 		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+		float minWinSizeX = style.WindowMinSize.x;
+		style.WindowMinSize.x = 370.0f;
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
+
+		style.WindowMinSize.x = minWinSizeX;
 
 		if (ImGui::BeginMenuBar())
 		{
@@ -173,7 +185,8 @@ namespace majkt {
 			ImGui::EndMenuBar();
 		}
 
-		ImGui::Begin("Settings");
+		scene_hierarchy_panel_.OnImGuiRender();
+		ImGui::Begin("Stats");
 
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
@@ -181,33 +194,6 @@ namespace majkt {
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-
-		if (square_entity_)
-		{
-			ImGui::Separator();
-			auto& tag = square_entity_.GetComponent<TagComponent>().Tag;
-			ImGui::Text("%s", tag.c_str());
-
-			auto& squareColor = square_entity_.GetComponent<SpriteRendererComponent>().Color;
-			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
-			ImGui::Separator();
-		}
-
-		ImGui::DragFloat3("Camera Transform",
-			glm::value_ptr(camera_entity_.GetComponent<TransformComponent>().Transform[3]));
-
-		if (ImGui::Checkbox("Camera A", &primary_camera_))
-		{
-			camera_entity_.GetComponent<CameraComponent>().Primary = primary_camera_;
-			second_camera_.GetComponent<CameraComponent>().Primary = !primary_camera_;
-		}
-
-		{
-			auto& camera = second_camera_.GetComponent<CameraComponent>().Camera;
-			float orthoSize = camera.GetOrthographicSize();
-			if (ImGui::DragFloat("Second Camera Ortho Size", &orthoSize))
-				camera.SetOrthographicSize(orthoSize);
-		}
 
 		ImGui::End();
 

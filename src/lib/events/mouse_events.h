@@ -57,7 +57,7 @@ class MouseButtonEvent : public Event
     public:
         MouseCode GetMouseButton() const { return button_; }
 
-        EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryMouse | EventCategory::kEventCategoryInput)
+        EVENT_CLASS_CATEGORY(EventCategory::kEventCategoryMouse | EventCategory::kEventCategoryInput | EventCategory::kEventCategoryMouseButton)
     protected:
         MouseButtonEvent(const int button)
             : button_(button) {}

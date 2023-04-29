@@ -11,9 +11,20 @@ namespace majkt {
 
 	void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 	{
+		projection_type_ = ProjectionType::Orthographic;
 		orthographic_size_ = size;
 		orthographic_near_ = nearClip;
 		orthographic_far_ = farClip;
+		RecalculateProjection();
+	}
+
+
+	void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farClip)
+	{
+		projection_type_ = ProjectionType::Perspective;
+		perspective_FOV_ = verticalFOV;
+		perspective_near_ = nearClip;
+		perspective_far_ = farClip;
 		RecalculateProjection();
 	}
 
@@ -25,13 +36,20 @@ namespace majkt {
 
 	void SceneCamera::RecalculateProjection()
 	{
-		float orthoLeft = -orthographic_size_ * aspect_ratio_ * 0.5f;
-		float orthoRight = orthographic_size_ * aspect_ratio_ * 0.5f;
-		float orthoBottom = -orthographic_size_ * 0.5f;
-		float orthoTop = orthographic_size_ * 0.5f;
+		if (projection_type_ == ProjectionType::Perspective)
+		{
+			projection_ = glm::perspective(perspective_FOV_, aspect_ratio_, perspective_near_, perspective_far_);
+		}
+		else
+		{
+			float orthoLeft = -orthographic_size_ * aspect_ratio_ * 0.5f;
+			float orthoRight = orthographic_size_ * aspect_ratio_ * 0.5f;
+			float orthoBottom = -orthographic_size_ * 0.5f;
+			float orthoTop = orthographic_size_ * 0.5f;
 
-		projection_ = glm::ortho(orthoLeft, orthoRight,
-			orthoBottom, orthoTop, orthographic_near_, orthographic_far_);
+			projection_ = glm::ortho(orthoLeft, orthoRight,
+				orthoBottom, orthoTop, orthographic_near_, orthographic_far_);
+		}
 	}
 
 } // namespace majkt

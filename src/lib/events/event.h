@@ -66,7 +66,7 @@ class EventDispatcher
         {
             if (event_.GetEventType() == T::GetStaticType())
             {
-                event_.handled_ = func(static_cast<T&>(event_));
+                event_.handled_ |= func(static_cast<T&>(event_));
                 return true;
             }
             return false;

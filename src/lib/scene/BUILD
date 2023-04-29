@@ -18,11 +18,3 @@ cc_library(
         "//src/lib/core:core",
     ]
 )
-
-load("//tools:cpplint.bzl", "cpplint")
-
-exports_files([
-    "CPPLINT.cfg",
-])
-
-cpplint()

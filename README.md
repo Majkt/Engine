@@ -1,6 +1,10 @@
-# MAJKT Engine
+<div style="text-align:center"> <img src="majkt_logo.png"
+     alt="Majkt Engine icon"
+     width="150" height="150" />
+</div>
+<br />
 
-MAJKT Engine is a game engine developed in C++ using OpenGL, ImGui, GLFW, and EnTT. It is designed to provide an intuitive and flexible development environment for creating 2D and 3D games.
+> MAJKT Engine is a game engine developed in C++ using OpenGL, ImGui, GLFW, and EnTT. It is designed to provide an intuitive and flexible development environment for creating 2D and 3D games.
 
 ## Requirements
 - C++17 or greater -compatible compiler
@@ -24,7 +28,7 @@ To get started with MAJKT Engine, follow these steps:
 ### Sandbox - Functionality test
 
 ```
-bazel run src/sandbox:sandbox_app
+bazel run src/sandbox:sandbox_app 
 ```
 
 ### Majkt Editor

@@ -2,6 +2,7 @@
 #define MAJKT_EDITOR_EDITOR_LAYER_H_
 
 #include "src/lib/majkt_export.h"
+#include "src/lib/scene/scene_hierarchy_panel.h"
 
 namespace majkt {
 
@@ -37,6 +38,9 @@ namespace majkt {
 		glm::vec2 viewport_size_ = { 0.0f, 0.0f };
 
 		glm::vec4 square_color_ = { 0.2f, 0.3f, 0.8f, 1.0f };
+
+		// Panels
+		SceneHierarchyPanel scene_hierarchy_panel_;
 	};
 
 } // namespace majkt

@@ -14,7 +14,7 @@ namespace majkt {
 	void LayerStack::PushLayer(Layer* layer)
 	{
 		layers_.emplace(layers_.begin() + layer_insert_index_, layer);
-		layer_insert_index_++;
+		++layer_insert_index_;
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay)
@@ -28,8 +28,8 @@ namespace majkt {
 		if (it != layers_.begin() + layer_insert_index_)
 		{
 			layers_.erase(it);
-			layer_insert_index_--;
 			layer->OnDetach();
+			--layer_insert_index_;
 		}
 	}
 

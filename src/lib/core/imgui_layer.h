@@ -25,6 +25,8 @@ namespace majkt {
 		void Begin();
 		void End();
 		void BlockEvents(bool block) { block_events_ = block; }
+
+		void SetDarkThemeColors();
 	private:
 		std::string ini_file_path_;
 		struct InitData

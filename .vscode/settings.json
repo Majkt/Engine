@@ -102,7 +102,8 @@
     "valarray": "cpp",
     "__bits": "cpp",
     "__verbose_abort": "cpp",
-    "csetjmp": "cpp"
+    "csetjmp": "cpp",
+    "*.inc": "cpp"
   },
   "lldb.displayFormat": "auto",
   "lldb.dereferencePointers": true,

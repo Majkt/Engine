@@ -1,5 +1,8 @@
 # -*- python -*-
 
+# modified from https://github.com/ApolloAuto/apollo/blob/master/tools/cpplint.bzl
+# also refer to https://github.com/RobotLocomotion/drake/blob/master/tools/lint/cpplint.bzl
+
 load("@rules_python//python:defs.bzl", "py_test")
 
 # From https://bazel.build/versions/master/docs/be/c-cpp.html#cc_library.srcs

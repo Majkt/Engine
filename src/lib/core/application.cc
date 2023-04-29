@@ -8,7 +8,7 @@
 
 #include "absl/functional/bind_front.h"
 
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 namespace majkt
 {
@@ -19,8 +19,8 @@ namespace majkt
 		MAJKT_PROFILE_FUNCTION();
 
 		if (instance_){
-			LOG(WARNING) << instance_ <<  " Application already exists!";
-		}
+			LOG(WARNING) << instance_ <<  "Application already exists!";
+		}		
 		instance_ = this;
 		window_ = Window::Create(WindowProps(name));
 		window_->SetEventCallback(absl::bind_front(&Application::OnEvent, this));

@@ -39,13 +39,14 @@ namespace majkt {
 			uint32_t DrawCalls = 0;
 			uint32_t QuadCount = 0;
 
-			uint32_t GetTotalVertexCount() { return QuadCount * 4; }
-			uint32_t GetTotalIndexCount() { return QuadCount * 6; }
+			uint32_t const GetTotalVertexCount() { return QuadCount * 4; }
+			uint32_t const GetTotalIndexCount() { return QuadCount * 6; }
 		};
 		static void ResetStats();
 		static Statistics GetStats();
 	private:
-		static void FlushAndReset();
+		static void StartBatch();
+		static void NextBatch();
 	};
 
 } // namespace majkt

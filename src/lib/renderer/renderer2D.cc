@@ -137,11 +137,8 @@ namespace majkt {
 		data_.TextureShader->Bind();
 		data_.TextureShader->SetMat4("view_projection_", camera.GetViewProjectionMatrix());
 
-		data_.QuadIndexCount = 0;
-		data_.QuadVertexBufferPtr = data_.QuadVertexBufferBase;
-
-		data_.TextureSlotIndex = 1;
-    }
+		StartBatch();
+	}
 
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
@@ -152,26 +149,31 @@ namespace majkt {
 		data_.TextureShader->Bind();
 		data_.TextureShader->SetMat4("view_projection_", viewProj);
 
-		data_.QuadIndexCount = 0;
-		data_.QuadVertexBufferPtr = data_.QuadVertexBufferBase;
-
-		data_.TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
 		MAJKT_PROFILE_FUNCTION();
-		uint32_t dataSize = (uint32_t)((uint8_t*)data_.QuadVertexBufferPtr - (uint8_t*)data_.QuadVertexBufferBase );
-		data_.QuadVertexBuffer->SetData(data_.QuadVertexBufferBase, dataSize);
-
 		Flush();
 	}
 
+	void Renderer2D::StartBatch()
+	{
+		data_.QuadIndexCount = 0;
+		data_.QuadVertexBufferPtr = data_.QuadVertexBufferBase;
+
+		data_.TextureSlotIndex = 1;
+	}
+	
 	void Renderer2D::Flush()
 	{
 		if (data_.QuadIndexCount == 0)
 			return; 
 			
+		uint32_t dataSize = (uint32_t)((uint8_t*)data_.QuadVertexBufferPtr - (uint8_t*)data_.QuadVertexBufferBase);
+		data_.QuadVertexBuffer->SetData(data_.QuadVertexBufferBase, dataSize);
+		
 		for (uint32_t i{0}; i < data_.TextureSlotIndex; ++i)
 			data_.TextureSlots[i]->Bind(i);
 
@@ -179,14 +181,10 @@ namespace majkt {
 		data_.Stats.DrawCalls++;
 	}
 
-	void Renderer2D::FlushAndReset()
+	void Renderer2D::NextBatch()
 	{
-		EndScene();
-
-		data_.QuadIndexCount = 0;
-		data_.QuadVertexBufferPtr = data_.QuadVertexBufferBase;
-
-		data_.TextureSlotIndex = 1;
+		Flush();
+		StartBatch();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -230,7 +228,7 @@ namespace majkt {
 		const float tilingFactor = 1.0f;
 
 		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
+			NextBatch();
 
 		for (size_t i{0}; i < quadVertexCount; i++)
 		{
@@ -255,7 +253,7 @@ namespace majkt {
 		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 
 		if (data_.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
+			NextBatch();
 
 		float textureIndex = 0.0f;
 		for (uint32_t i{1}; i < data_.TextureSlotIndex; ++i)
@@ -270,7 +268,7 @@ namespace majkt {
 		if (textureIndex == 0.0f)
 		{
 			if (data_.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
-				FlushAndReset();
+				NextBatch();
 
 			textureIndex = (float)data_.TextureSlotIndex;
 			data_.TextureSlots[data_.TextureSlotIndex] = texture;

@@ -18,15 +18,16 @@ namespace majkt
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
-		std::vector<Layer*>::iterator begin() { return layers_.begin(); }
-		std::vector<Layer*>::iterator end() { return layers_.end(); }
-		std::vector<Layer*>::reverse_iterator rbegin() { return layers_.rbegin(); }
-		std::vector<Layer*>::reverse_iterator rend() { return layers_.rend(); }
+		auto begin() { return layers_.begin(); }
+		auto end() { return layers_.end(); }
+		auto rbegin() { return layers_.rbegin(); }
+		auto rend() { return layers_.rend(); }
 
-		std::vector<Layer*>::const_iterator begin() const { return layers_.begin(); }
-		std::vector<Layer*>::const_iterator end()	const { return layers_.end(); }
-		std::vector<Layer*>::const_reverse_iterator rbegin() const { return layers_.rbegin(); }
-		std::vector<Layer*>::const_reverse_iterator rend() const { return layers_.rend(); }
+		auto begin() const { return layers_.begin(); }
+		auto end() const { return layers_.end(); }
+		auto rbegin() const { return layers_.rbegin(); }
+		auto rend() const { return layers_.rend(); }
+		
 	private:
 		std::vector<Layer*> layers_;
 		unsigned int layer_insert_index_{0};
