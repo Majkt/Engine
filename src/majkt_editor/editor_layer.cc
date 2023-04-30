@@ -1,9 +1,18 @@
 #include "src/majkt_editor/editor_layer.h"
+#include "src/lib/scene/scene_serializer.h"
+#include "src/lib/core/file_options.h"
 
 #include "imgui.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "third_party/imguizmo/ImGuizmo.h"
+#include "absl/functional/bind_front.h"
+
+#include <glog/logging.h>
+#include "glog/stl_logging.h"
+#include <iostream>
 
 namespace majkt {
 
@@ -27,57 +36,6 @@ namespace majkt {
 
 		// Creates Scene
 		active_scene_ = std::make_shared<Scene>();
-
-
-#if 0
-		// Defines Entities
-		auto square = active_scene_->CreateEntity("Green Square");
-		square.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-
-		auto redSquare = active_scene_->CreateEntity("Red Square");
-		redSquare.AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
-
-		square_entity_ = square;
-
-		camera_entity_ = active_scene_->CreateEntity("Camera A");
-		camera_entity_.AddComponent<CameraComponent>();
-
-		second_camera_ = active_scene_->CreateEntity("Camera B");
-		auto& cc = second_camera_.AddComponent<CameraComponent>();
-		cc.Primary = false;
-
-		class CameraController : public ScriptableEntity
-		{
-		public:
-			virtual void OnCreate() override
-			{
-				auto& translation = GetComponent<TransformComponent>().Translation;
-				translation.x = rand() % 10 - 5.0f;
-			}
-
-			virtual void OnDestroy() override
-			{
-			}
-
-			virtual void OnUpdate(Timestep ts) override
-			{
-				auto& translation = GetComponent<TransformComponent>().Translation;
-				float speed = 5.0f;
-
-				if (Input::IsKeyPressed(Key::A))
-					translation.x -= speed * ts;
-				if (Input::IsKeyPressed(Key::D))
-					translation.x += speed * ts;
-				if (Input::IsKeyPressed(Key::W))
-					translation.y += speed * ts;
-				if (Input::IsKeyPressed(Key::S))
-					translation.y -= speed * ts;
-			}
-		};
-
-		camera_entity_.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-		second_camera_.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-#endif
 		scene_hierarchy_panel_.SetContext(active_scene_);
 	}
 
@@ -178,6 +136,18 @@ namespace majkt {
 				// which we can't undo at the moment without finer window depth/z control.
 				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
+				if (ImGui::MenuItem("Serialize"))
+				{
+					SceneSerializer serializer(active_scene_);
+					serializer.Serialize(get_current_dir() + "/src/majkt_editor/assets/scenes/example.majkt");
+				}
+
+				if (ImGui::MenuItem("Deserialize"))
+				{
+					SceneSerializer serializer(active_scene_);
+					serializer.Deserialize(get_current_dir() + "/src/majkt_editor/assets/scenes/example.majkt");
+				}
+
 				if (ImGui::MenuItem("Exit")) Application::Get().Close();
 				ImGui::EndMenu();
 			}
@@ -202,20 +172,146 @@ namespace majkt {
 
 		viewport_focused_ = ImGui::IsWindowFocused();
 		viewport_hovered_ = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->BlockEvents(!viewport_focused_ || !viewport_hovered_);
+		Application::Get().GetImGuiLayer()->BlockEvents(!viewport_focused_ && !viewport_hovered_);
 		
 		ImVec2 viewportPanelSize{ImGui::GetContentRegionAvail()};
 		viewport_size_ = { viewportPanelSize.x, viewportPanelSize.y };
 		uint64_t textureID = framebuffer_->GetColorAttachmentRendererID();
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ viewport_size_.x, viewport_size_.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		// Gizmos
+		Entity selectedEntity = scene_hierarchy_panel_.GetSelectedEntity();
+		if (selectedEntity && gizmo_type_ != -1)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			float windowWidth = (float)ImGui::GetWindowWidth();
+			float windowHeight = (float)ImGui::GetWindowHeight();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+			// Camera
+			auto cameraEntity = active_scene_->GetPrimaryCameraEntity();
+			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+			const glm::mat4& cameraProjection = camera.GetProjection();
+			glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+			// Entity transform
+			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			glm::mat4 transform = tc.GetTransform();
+
+			// Snapping
+			bool snap = Input::IsKeyPressed(Key::LeftControl);
+			float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+			// Snap to 45 degrees for rotation
+			if (gizmo_type_ == ImGuizmo::OPERATION::ROTATE)
+				snapValue = 45.0f;
+
+			float snapValues[3] = { snapValue, snapValue, snapValue };
+
+			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+				(ImGuizmo::OPERATION)gizmo_type_, ImGuizmo::LOCAL, glm::value_ptr(transform),
+				nullptr, snap ? snapValues : nullptr);
+
+			if (ImGuizmo::IsUsing())
+			{
+				glm::vec3 translation, rotation, scale;
+				math::DecomposeTransform(transform, translation, rotation, scale);
+
+				glm::vec3 deltaRotation = rotation - tc.Rotation;
+				tc.Translation = translation;
+				tc.Rotation += deltaRotation;
+				tc.Scale = scale;
+			}
+		}
+
 		ImGui::End();
 		ImGui::PopStyleVar();
 
 		ImGui::End();
 	}
 
+	void EditorLayer::NewScene()
+	{
+		active_scene_ = std::make_shared<Scene>();
+		active_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+		scene_hierarchy_panel_.SetContext(active_scene_);
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		std::string filepath = FileOptions::OpenFile("Majkt Scene (*.majkt)\0*.majkt\0");
+		if (!filepath.empty())
+		{
+			active_scene_ = std::make_shared<Scene>();
+			active_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+			scene_hierarchy_panel_.SetContext(active_scene_);
+
+			SceneSerializer serializer(active_scene_);
+			serializer.Deserialize(filepath);
+		}
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		std::string filepath = FileOptions::SaveFile("Majkt Scene (*.majkt)\0*.majkt\0");
+		if (!filepath.empty())
+		{
+			filepath += ".majkt";
+			SceneSerializer serializer(active_scene_);
+			serializer.Serialize(filepath);
+		}
+	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+	{
+		// Shortcuts
+		if (e.GetRepeatCount() > 0)
+			return false;
+
+		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+		switch (e.GetKeyCode())
+		{
+			case Key::N:
+			{
+				if (shift)
+					NewScene();
+				break;
+			}
+			case Key::O:
+			{
+				if (shift)
+					OpenScene();
+				break;
+			}
+			case Key::S:
+			{
+				if (shift)
+					SaveSceneAs();
+				break;
+			}
+					
+			// Gizmos
+			case Key::Q:
+				gizmo_type_ = -1;
+				break;
+			case Key::W:
+				gizmo_type_ = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			case Key::E:
+				gizmo_type_ = ImGuizmo::OPERATION::ROTATE;
+				break;
+			case Key::R:
+				gizmo_type_ = ImGuizmo::OPERATION::SCALE;
+				break;
+		}
+	}
+	
 	void EditorLayer::OnEvent(Event& e)
 	{
 		camera_controller_.OnEvent(e);
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(absl::bind_front(&EditorLayer::OnKeyPressed, this));
 	}
 }

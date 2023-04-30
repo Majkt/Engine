@@ -17,6 +17,7 @@ namespace majkt {
 	void SceneHierarchyPanel::SetContext(const std::shared_ptr<Scene>& context)
 	{
 		context_ = context;
+		selection_context_ = {};
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()

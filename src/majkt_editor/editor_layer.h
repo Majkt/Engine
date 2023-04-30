@@ -19,6 +19,12 @@ namespace majkt {
 		virtual void OnImGuiRender() override;
 		void OnEvent(Event& e) override;
 	private:
+		bool OnKeyPressed(KeyPressedEvent& e);
+		
+		void NewScene();
+		void OpenScene();
+		void SaveSceneAs();
+
 		majkt::OrthographicCameraController camera_controller_;
 
 		// Temp
@@ -38,6 +44,8 @@ namespace majkt {
 		glm::vec2 viewport_size_ = { 0.0f, 0.0f };
 
 		glm::vec4 square_color_ = { 0.2f, 0.3f, 0.8f, 1.0f };
+		
+		int gizmo_type_{-1};
 
 		// Panels
 		SceneHierarchyPanel scene_hierarchy_panel_;

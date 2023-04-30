@@ -7,6 +7,7 @@
 #include "third_party/imgui/imgui_internal.h"
 #include "third_party/imgui/backends/imgui_impl_opengl3.h"
 
+#include "third_party/imguizmo/ImGuizmo.h"
 #include <glad/glad.h>
 #include "GLFW/glfw3.h"
 
@@ -113,7 +114,6 @@ namespace majkt {
 		// - Read 'docs/FONTS.md' for more instructions and details.
 		// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
 		//io.Fonts->AddFontDefault();
-		LOG(INFO) << get_current_dir();
 		// io.Fonts->AddFontFromFileTTF((get_current_dir() + "/src/majkt_editor/assets/fonts/opensans/static/OpenSans-Bold.ttf").c_str(), 18.0f);
 		//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 		// io.FontDefault = io.Fonts->AddFontFromFileTTF((get_current_dir() + "/src/majkt_editor/assets/fonts/opensans/static/OpenSans-Regular.ttf").c_str(), 18.0f);
@@ -148,6 +148,7 @@ namespace majkt {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::End()

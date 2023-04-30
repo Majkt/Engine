@@ -14,6 +14,7 @@ cc_library(
         "application.h",
         "base_export.h",
         "core.h",
+        "file_options.h",
         "imgui_layer.h",
         "input.h",
         "key_codes.h",
@@ -38,6 +39,8 @@ cc_library(
         "@glfw//:glfw",
         "//third_party/glad",
         "//third_party/imgui",
+        "//third_party/imguizmo",
+        "//third_party/imguizmo_quat",
     ],
 )
 
@@ -50,8 +53,8 @@ cc_library(
         "@glog",
         "@com_github_gflags_gflags//:gflags",
         "//src/lib/events:events",
-        "//src/lib/platform/windows:windows",
         "//src/lib/platform/macOS:macOS",
+        "//src/lib/platform/windows:windows",
     ],
 )
 

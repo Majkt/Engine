@@ -5,6 +5,7 @@
     #define GL_SILENCE_DEPRECATION
 #endif
 
+
 #include "src/lib/core/core.h"
 #include "src/lib/core/application.h"
 #include "src/lib/core/layer.h"
@@ -16,11 +17,14 @@
 #include "src/lib/core/orthographic_camera_controller.h"
 #include "src/lib/core/perspective_camera_controller.h"
 
+#include "src/lib/math/math.h"
+
 #include "src/lib/scene/entity.h"
 #include "src/lib/scene/components.h"
 #include "src/lib/scene/scene.h"
 #include "src/lib/scene/scriptable_entity.h"
 #include "src/lib/scene/scene_hierarchy_panel.h"
+#include "src/lib/scene/scene_serializer.h"
 
 #include "src/lib/debug/instrumentor.h"
 

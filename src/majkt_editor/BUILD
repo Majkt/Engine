@@ -11,5 +11,6 @@ cc_binary(
     srcs = glob(["*.cc", "*.h"]),
     deps = [
         "//src/lib:engine", 
+        "@com_google_absl//absl/functional:bind_front",
     ],
 )

@@ -20,6 +20,7 @@ namespace majkt {
 		void SetContext(const std::shared_ptr<Scene>& scene);
 
 		void OnImGuiRender();
+		Entity GetSelectedEntity() const { return selection_context_; }
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);

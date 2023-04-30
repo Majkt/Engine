@@ -13,6 +13,7 @@ cc_library(
         "//third_party/glad",
         "//third_party/glm",
         "//third_party/stb_image",
+        "//third_party/yaml-cpp",
         "@com_google_absl//absl/functional:bind_front",
         "//src/lib/renderer:renderer",
         "//src/lib/core:core",

@@ -45,7 +45,7 @@ namespace majkt {
 		{
 			MAJKT_PROFILE_SCOPE("glfwInit");
 			// TODO: glfwTerminate on system shutdown
-			int success = glfwInit();
+			glfwInit();
             // LOG(INFO) << "glfwInit() = " << success;
 
 			glfwSetErrorCallback(GLFWErrorCallback);

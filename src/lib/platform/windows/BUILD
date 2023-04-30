@@ -12,13 +12,6 @@ cc_library(
         "//src/lib/renderer:renderer",
         "@glfw//:glfw",
         "//third_party/glad",
+        "//third_party/portable-file-dialogs",
     ],
 )
-
-load("//tools:cpplint.bzl", "cpplint")
-
-exports_files([
-    "CPPLINT.cfg",
-])
-
-cpplint()

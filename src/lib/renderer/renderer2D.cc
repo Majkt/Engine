@@ -111,7 +111,7 @@ namespace majkt {
 		for (uint32_t i{0}; i < data_.MaxTextureSlots; i++)
 			samplers[i] = i;
 
-        data_.TextureShader = Shader::Create(get_current_dir() + "/src/sandbox/assets/shaders/Texture.glsl");
+        data_.TextureShader = Shader::Create(get_current_dir() + "/src/majkt_editor/assets/shaders/Texture.glsl");
 		data_.TextureShader->Bind();
 		data_.TextureShader->SetIntArray("uniform_textures_", samplers, data_.MaxTextureSlots);
 
