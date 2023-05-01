@@ -1,6 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
+    name = "core_for_editor",
+    srcs = ["uuid.cc"],
+    hdrs = ["core.h", "platform_detection.h", "input.h", "key_codes.h", "mouse_button_codes.h", "timestep.h", "base_export.h", 'math_util.h', "uuid.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@glog",
+        "//third_party/glm",
+    ],
+)
+
+cc_library(
     name = "core",
     srcs = [
         "application.cc",
@@ -8,7 +19,7 @@ cc_library(
         "layer_stack.cc",
         "imgui_layer.cc",
         "orthographic_camera_controller.cc",
-        "perspective_camera_controller.cc",
+        "uuid.cc"
     ],
     hdrs = [
         "application.h",
@@ -25,8 +36,8 @@ cc_library(
         "timestep.h",
         "platform_detection.h",
         "orthographic_camera_controller.h",
-        "perspective_camera_controller.h",
         "window.h",
+        "uuid.h"
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -57,11 +68,3 @@ cc_library(
         "//src/lib/platform/windows:windows",
     ],
 )
-
-load("//tools:cpplint.bzl", "cpplint")
-
-exports_files([
-    "CPPLINT.cfg",
-])
-
-cpplint()

@@ -5,6 +5,10 @@
             "includePath": [
                 "${workspaceFolder}/src/**",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/",
+                "${workspaceFolder}",
+                "${workspaceFolder}/third_party",
+                "/private/var/tmp/_bazel_joesuzuki/262c9972e748fc50beb171083688dea5/external/entt/src",
+                "/private/var/tmp/_bazel_joesuzuki/262c9972e748fc50beb171083688dea5/execroot/__main__/bazel-out/darwin_arm64-fastbuild/bin/external/glog/src"
             ]
         }
     ],

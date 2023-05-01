@@ -3,7 +3,7 @@
 
 namespace majkt 
 {
-    
+
 	class Timestep
 	{
 	public:

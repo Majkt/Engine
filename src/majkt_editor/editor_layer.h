@@ -20,14 +20,20 @@ namespace majkt {
 		void OnEvent(Event& e) override;
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 		
 		void NewScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
+
+		void OnScenePlay();
+		void OnSceneStop();
+
+		void UI_Toolbar();
 
 		majkt::OrthographicCameraController camera_controller_;
 
-		// Temp
 		std::shared_ptr<VertexArray> square_vertex_array_;
 		std::shared_ptr<Shader> flat_color_shader_;
 		std::shared_ptr<Framebuffer> framebuffer_;
@@ -36,19 +42,32 @@ namespace majkt {
 		Entity square_entity_;
 		Entity camera_entity_;
 		Entity second_camera_;
+		Entity hovered_entity_;
 
 		bool primary_camera_{true};
+
+		EditorCamera editor_camera_;
 
 		std::shared_ptr<Texture2D> checker_board_texture_, style_texture_;
 		bool viewport_focused_ = false, viewport_hovered_ = false;
 		glm::vec2 viewport_size_ = { 0.0f, 0.0f };
+		glm::vec2 viewport_bounds_[2];
 
 		glm::vec4 square_color_ = { 0.2f, 0.3f, 0.8f, 1.0f };
 		
 		int gizmo_type_{-1};
 
+		enum class SceneState
+		{
+			Edit = 0, Play = 1
+		};
+		SceneState scene_state_ = SceneState::Edit;
+
 		// Panels
 		SceneHierarchyPanel scene_hierarchy_panel_;
+		ContentBrowserPanel content_browser_panel_;
+
+		std::shared_ptr<Texture2D> play_button_, stop_button_;
 	};
 
 } // namespace majkt

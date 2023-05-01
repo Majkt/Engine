@@ -32,6 +32,7 @@ namespace majkt {
 		LOG(INFO) << "  Vendor: " << glGetString(GL_VENDOR);
 		LOG(INFO) << "  Renderer: " << glGetString(GL_RENDERER);
 		LOG(INFO) << "  Version: " << glGetString(GL_VERSION);
+		LOG(INFO) << "  GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
 	}
 
 	void OpenGLContext::SwapBuffers()

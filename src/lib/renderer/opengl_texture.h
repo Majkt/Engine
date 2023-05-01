@@ -25,12 +25,15 @@ namespace majkt {
 		virtual void SetData(void* data, uint32_t size) override;
 		virtual void Bind(uint32_t slot = 0) const override;
 
+		virtual bool IsLoaded() const override { return is_loaded_; }
+
 		virtual bool operator==(const Texture& other) const override
 		{
 			return renderer_id_ == ((OpenGLTexture2D&)other).renderer_id_;
 		}
 	private:
 		std::string path_;
+		bool is_loaded_{false};
 		uint32_t width_, height_;
 		uint32_t renderer_id_;
 		GLenum internal_format_, data_format_;

@@ -16,6 +16,8 @@
 
 namespace majkt {
 
+	extern const std::filesystem::path asset_path_;
+
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), camera_controller_(1280.0f / 720.0f), square_color_({ 0.2f, 0.3f, 0.8f, 1.0f })
 	{
@@ -28,14 +30,17 @@ namespace majkt {
 
 	    checker_board_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/majkt_editor/assets/textures/Checkerboard.png");
 	    style_texture_ = majkt::Texture2D::Create(get_current_dir() + "/src/majkt_editor/assets/textures/style.png");
+		play_button_ = majkt::Texture2D::Create(get_current_dir() + "/src/majkt_editor/assets/editor/play_button.png");
+		stop_button_ = majkt::Texture2D::Create(get_current_dir() + "/src/majkt_editor/assets/editor/stop_button.png");
 
 		FramebufferSpecification fbSpec;
-		fbSpec.Width = 1280;
+		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };		fbSpec.Width = 1280;
 		fbSpec.Height = 720;
 		framebuffer_ = Framebuffer::Create(fbSpec);
 
 		// Creates Scene
 		active_scene_ = std::make_shared<Scene>();
+		editor_camera_ = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 		scene_hierarchy_panel_.SetContext(active_scene_);
 	}
 
@@ -55,13 +60,10 @@ namespace majkt {
 		{
 			framebuffer_->Resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 			camera_controller_.OnResize(viewport_size_.x, viewport_size_.y);
-		
+			editor_camera_.SetViewportSize(viewport_size_.x, viewport_size_.y);
+
 			active_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 		}
-
-		// Update
-		if (viewport_focused_)
-			camera_controller_.OnUpdate(ts);
 
 		// Render
 		Renderer2D::ResetStats();
@@ -69,8 +71,40 @@ namespace majkt {
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		RenderCommand::Clear();
 
-		// Update scene
-		active_scene_->OnUpdate(ts);
+		// Clear our entity ID attachment to -1
+		framebuffer_->ClearAttachment(1, -1);
+
+		switch (scene_state_)
+		{
+			case SceneState::Edit:
+			{
+				if (viewport_focused_)
+					camera_controller_.OnUpdate(ts);
+
+				editor_camera_.OnUpdate(ts);
+
+				active_scene_->OnUpdateEditor(ts, editor_camera_);
+				break;
+			}
+			case SceneState::Play:
+			{
+				active_scene_->OnUpdateRuntime(ts);
+				break;
+			}
+		}	
+		auto[mx, my] = ImGui::GetMousePos();
+		mx -= viewport_bounds_[0].x;
+		my -= viewport_bounds_[0].y;
+		glm::vec2 viewportSize = viewport_bounds_[1] - viewport_bounds_[0];
+		my = viewportSize.y - my;
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+		{
+			int pixelData = framebuffer_->ReadPixel(1, mouseX, mouseY);
+			hovered_entity_ = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, active_scene_.get());
+		}
 		framebuffer_->Unbind();
 	}
 
@@ -130,36 +164,44 @@ namespace majkt {
 
 		if (ImGui::BeginMenuBar())
 		{
+			// if (ImGui::BeginMenu("Majkt Editor"))
+			// {
+			// 	if (ImGui::MenuItem("Quit Majkt Editor")) 
+			// 		Application::Get().Close();
+			// 	ImGui::EndMenu();
+			// }
+
 			if (ImGui::BeginMenu("File"))
 			{
-				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
-				// which we can't undo at the moment without finer window depth/z control.
-				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
-
-				if (ImGui::MenuItem("Serialize"))
-				{
-					SceneSerializer serializer(active_scene_);
-					serializer.Serialize(get_current_dir() + "/src/majkt_editor/assets/scenes/example.majkt");
-				}
-
-				if (ImGui::MenuItem("Deserialize"))
-				{
-					SceneSerializer serializer(active_scene_);
-					serializer.Deserialize(get_current_dir() + "/src/majkt_editor/assets/scenes/example.majkt");
-				}
-
-				if (ImGui::MenuItem("Exit")) Application::Get().Close();
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					NewScene();
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
+				if (ImGui::MenuItem("Close", "Cmd+Q")) 
+					Application::Get().Close();
 				ImGui::EndMenu();
 			}
+			if (ImGui::BeginMenu("Edit")){ ImGui::EndMenu(); }
+			if (ImGui::BeginMenu("Window")){ ImGui::EndMenu();}
+			
 
 			ImGui::EndMenuBar();
 		}
 
 		scene_hierarchy_panel_.OnImGuiRender();
-		ImGui::Begin("Stats");
+		content_browser_panel_.OnImGuiRender();
+		ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar );
+
+		// std::string name{"None"};
+		// if (hovered_entity_)
+		// 	name = hovered_entity_.GetComponent<TagComponent>().Tag;
+		// ImGui::Text("Hovered Entity: %s", name.c_str());
 
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
+		// ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
@@ -168,7 +210,13 @@ namespace majkt {
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-		ImGui::Begin("Viewport");
+		ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		auto viewportOffset = ImGui::GetWindowPos();
+		viewport_bounds_[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+		viewport_bounds_[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 		viewport_focused_ = ImGui::IsWindowFocused();
 		viewport_hovered_ = ImGui::IsWindowHovered();
@@ -179,6 +227,16 @@ namespace majkt {
 		uint64_t textureID = framebuffer_->GetColorAttachmentRendererID();
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ viewport_size_.x, viewport_size_.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				OpenScene(std::filesystem::path(asset_path_) / path);
+			}
+			ImGui::EndDragDropTarget();
+		}
+
 		// Gizmos
 		Entity selectedEntity = scene_hierarchy_panel_.GetSelectedEntity();
 		if (selectedEntity && gizmo_type_ != -1)
@@ -186,15 +244,15 @@ namespace majkt {
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
 
-			float windowWidth = (float)ImGui::GetWindowWidth();
-			float windowHeight = (float)ImGui::GetWindowHeight();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+			ImGuizmo::SetRect(viewport_bounds_[0].x, viewport_bounds_[0].y, viewport_bounds_[1].x - viewport_bounds_[0].x, viewport_bounds_[1].y - viewport_bounds_[0].y);
 
 			// Camera
-			auto cameraEntity = active_scene_->GetPrimaryCameraEntity();
-			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			const glm::mat4& cameraProjection = camera.GetProjection();
-			glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+			// auto cameraEntity = active_scene_->GetPrimaryCameraEntity();
+			// const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+			// const glm::mat4& cameraProjection = camera.GetProjection();
+			// glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+			const glm::mat4& cameraProjection = editor_camera_.GetProjection();
+			glm::mat4 cameraView = editor_camera_.GetViewMatrix();
 
 			// Entity transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
@@ -227,8 +285,47 @@ namespace majkt {
 
 		ImGui::End();
 		ImGui::PopStyleVar();
+		UI_Toolbar();
 
 		ImGui::End();
+	}
+
+	void EditorLayer::UI_Toolbar()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		auto& colors = ImGui::GetStyle().Colors;
+		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
+
+		float size = ImGui::GetWindowHeight() - 4.0f;
+		std::shared_ptr<Texture2D> icon = scene_state_ == SceneState::Edit ? play_button_ : stop_button_;
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+		{
+			if (scene_state_ == SceneState::Edit)
+				OnScenePlay();
+			else if (scene_state_ == SceneState::Play)
+				OnSceneStop();
+		}
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
+		ImGui::End();
+	}
+
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+	{
+		if (e.GetMouseButton() == Mouse::ButtonLeft)
+		{
+			if (viewport_hovered_ && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+				scene_hierarchy_panel_.SetSelectedEntity(hovered_entity_);
+		}
+		return false;
 	}
 
 	void EditorLayer::NewScene()
@@ -242,14 +339,23 @@ namespace majkt {
 	{
 		std::string filepath = FileOptions::OpenFile("Majkt Scene (*.majkt)\0*.majkt\0");
 		if (!filepath.empty())
-		{
-			active_scene_ = std::make_shared<Scene>();
-			active_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-			scene_hierarchy_panel_.SetContext(active_scene_);
+			OpenScene(filepath);
+	}
 
-			SceneSerializer serializer(active_scene_);
-			serializer.Deserialize(filepath);
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		if (path.extension().string() != ".majkt")
+		{
+			LOG(WARNING) << "Could not load " << path.filename().string() << " - not a scene file";
+			return;
 		}
+
+		active_scene_ = std::make_shared<Scene>();
+		active_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+		scene_hierarchy_panel_.SetContext(active_scene_);
+
+		SceneSerializer serializer(active_scene_);
+		serializer.Deserialize(path);
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -271,47 +377,77 @@ namespace majkt {
 
 		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
 		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+		bool command = Input::IsKeyPressed(Key::LeftSuper) || Input::IsKeyPressed(Key::RightSuper);
+
 		switch (e.GetKeyCode())
 		{
 			case Key::N:
 			{
-				if (shift)
+				if (control || command)
 					NewScene();
 				break;
 			}
 			case Key::O:
 			{
-				if (shift)
+				if (control || command)
 					OpenScene();
 				break;
 			}
 			case Key::S:
 			{
-				if (shift)
+				if (control || command)
 					SaveSceneAs();
 				break;
 			}
-					
-			// Gizmos
+			
 			case Key::Q:
-				gizmo_type_ = -1;
+			{
+				if (command)
+					Application::Get().Close();
+					
+				if (!ImGuizmo::IsUsing())
+					gizmo_type_ = -1;
 				break;
+			}
 			case Key::W:
-				gizmo_type_ = ImGuizmo::OPERATION::TRANSLATE;
+			{
+				if (!ImGuizmo::IsUsing())
+					gizmo_type_ = ImGuizmo::OPERATION::TRANSLATE;
 				break;
+			}
 			case Key::E:
-				gizmo_type_ = ImGuizmo::OPERATION::ROTATE;
+			{
+				if (!ImGuizmo::IsUsing())
+					gizmo_type_ = ImGuizmo::OPERATION::ROTATE;
 				break;
+			}
 			case Key::R:
-				gizmo_type_ = ImGuizmo::OPERATION::SCALE;
+			{
+				if (!ImGuizmo::IsUsing())
+					gizmo_type_ = ImGuizmo::OPERATION::SCALE;
 				break;
+			}
 		}
 	}
 	
 	void EditorLayer::OnEvent(Event& e)
 	{
 		camera_controller_.OnEvent(e);
+		editor_camera_.OnEvent(e);
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(absl::bind_front(&EditorLayer::OnKeyPressed, this));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(absl::bind_front(&EditorLayer::OnMouseButtonPressed, this));
 	}
+
+	void EditorLayer::OnScenePlay()
+	{
+		scene_state_ = SceneState::Play;
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		scene_state_ = SceneState::Edit;
+
+	}
+
 }

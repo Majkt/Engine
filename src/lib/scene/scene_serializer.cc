@@ -176,7 +176,17 @@ namespace majkt {
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
 
-		YAML::Node data = YAML::Load(strStream.str());
+		YAML::Node data;
+		try
+		{
+			data = YAML::Load(strStream.str());
+		}
+		catch (YAML::ParserException e)
+		{
+			LOG(ERROR) << "Failed to load scene file '" << filepath << "': " << e.what();
+			return false;
+		}
+
 		if (!data["Scene"]) return false;
 
 		std::string sceneName = data["Scene"].as<std::string>();

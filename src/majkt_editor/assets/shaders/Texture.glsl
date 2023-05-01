@@ -8,6 +8,7 @@ layout(location = 1) in vec4 array_color_;
 layout(location = 2) in vec2 array_texture_coord_;
 layout(location = 3) in float array_texture_index_;
 layout(location = 4) in float array_tiling_factor_;
+layout(location = 5) in float array_entityID_;
 
 uniform mat4 view_projection_;
 uniform mat4 transform_;
@@ -16,6 +17,7 @@ out vec4 view_color_;
 out vec2 view_texture_coord_;
 out float view_texture_index_;
 out float view_tiling_factor_;
+out float view_entityID_;
 
 void main()
 {
@@ -23,6 +25,7 @@ void main()
 	view_texture_coord_ = array_texture_coord_;
 	view_texture_index_ = array_texture_index_;
 	view_tiling_factor_ = array_tiling_factor_;
+        view_entityID_ = array_entityID_;
 	gl_Position = view_projection_ * vec4(array_position_, 1.0);
 }
 
@@ -30,11 +33,13 @@ void main()
 #version 410 core
 
 layout(location = 0) out vec4 color;
+layout(location = 1) out int color2;
 
 in vec4 view_color_;
 in vec2 view_texture_coord_;
 in float view_texture_index_;
 in float view_tiling_factor_;
+in float view_entityID_;
 
 uniform sampler2D uniform_textures_[16];
 
@@ -63,4 +68,5 @@ void main()
 	}
 
 	color = texture_val_ * view_color_;
+        color2 = int(view_entityID_ + 0.9);
 }

@@ -13,6 +13,7 @@ cc_library(
         "//src/lib/core:window",
         "//src/lib/scene:scene",
         "//src/lib/math:math",
+        "//src/lib/editor:editor",
     ],
 )
 

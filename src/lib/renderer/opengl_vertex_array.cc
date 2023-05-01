@@ -67,6 +67,17 @@ namespace majkt {
 				case ShaderDataType::Float2:
 				case ShaderDataType::Float3:
 				case ShaderDataType::Float4:
+				{
+					glEnableVertexAttribArray(vertex_buffer_index_);
+					glVertexAttribPointer(vertex_buffer_index_,
+						element.GetComponentCount(),
+						ShaderDataTypeToOpenGLBaseType(element.Type),
+						element.Normalized ? GL_TRUE : GL_FALSE,
+						layout.GetStride(),
+						(const void*)element.Offset);
+					vertex_buffer_index_++;
+					break;
+				}
 				case ShaderDataType::Int:
 				case ShaderDataType::Int2:
 				case ShaderDataType::Int3:
@@ -74,10 +85,9 @@ namespace majkt {
 				case ShaderDataType::Bool:
 				{
 					glEnableVertexAttribArray(vertex_buffer_index_);
-					glVertexAttribPointer(vertex_buffer_index_,
+					glVertexAttribIPointer(vertex_buffer_index_,
 						element.GetComponentCount(),
 						ShaderDataTypeToOpenGLBaseType(element.Type),
-						element.Normalized ? GL_TRUE : GL_FALSE,
 						layout.GetStride(),
 						(const void*)element.Offset);
 					vertex_buffer_index_++;

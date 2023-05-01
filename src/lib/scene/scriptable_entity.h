@@ -2,6 +2,7 @@
 #define MAJKT_SCENE_SCRIPTABLE_ENTITY_H_
 
 #include "src/lib/scene/entity.h"
+#include "src/lib/core/timestep.h"
 
 namespace majkt {
 

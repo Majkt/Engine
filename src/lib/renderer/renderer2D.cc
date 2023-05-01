@@ -4,6 +4,8 @@
 #include "src/lib/renderer/shader.h"
 #include "src/lib/renderer/render_command.h"
 
+#include "src/lib/editor/editor_camera.h"
+
 #include "src/lib/debug/instrumentor.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -20,6 +22,8 @@
 #endif
 
 #include <string>
+#include <array>
+#include <memory>
 
 inline std::string get_current_dir() {
     char buff[FILENAME_MAX]; //create string buffer to hold path
@@ -39,6 +43,7 @@ namespace majkt {
 		glm::vec2 TexCoord;
 		float TexIndex;
 		float TilingFactor;
+		int EntityID;
 	};
 
 	struct Renderer2DData
@@ -77,7 +82,8 @@ namespace majkt {
 			{ ShaderDataType::Float4, "array_color_" },
 			{ ShaderDataType::Float2, "array_texture_coord_" },
 			{ ShaderDataType::Float,  "array_texture_index_" },
-			{ ShaderDataType::Float,  "array_tiling_factor_" }
+			{ ShaderDataType::Float,  "array_tiling_factor_" },
+			{ ShaderDataType::Int,  "array_entityID_" }
 		});
 		data_.QuadVertexArray->AddVertexBuffer(data_.QuadVertexBuffer);
 
@@ -131,6 +137,15 @@ namespace majkt {
 		delete[] data_.QuadVertexBufferBase;
 	}
 
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		MAJKT_PROFILE_FUNCTION();
+		data_.TextureShader->Bind();
+		data_.TextureShader->SetMat4("view_projection_", camera.GetViewProjection());
+
+		StartBatch();
+	}
+
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
 		MAJKT_PROFILE_FUNCTION();
@@ -143,11 +158,8 @@ namespace majkt {
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		MAJKT_PROFILE_FUNCTION();
-
-		glm::mat4 viewProj = camera.GetProjection() * glm::inverse(transform);
-
 		data_.TextureShader->Bind();
-		data_.TextureShader->SetMat4("view_projection_", viewProj);
+		data_.TextureShader->SetMat4("view_projection_", camera.GetProjection() * glm::inverse(transform));
 
 		StartBatch();
 	}
@@ -217,7 +229,7 @@ namespace majkt {
 		DrawQuad(transform, texture, tilingFactor, tintColor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)
 	{
 		MAJKT_PROFILE_FUNCTION();
 		
@@ -237,6 +249,7 @@ namespace majkt {
 			data_.QuadVertexBufferPtr->TexCoord = textureCoords[i];
 			data_.QuadVertexBufferPtr->TexIndex = textureIndex;
 			data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			data_.QuadVertexBufferPtr->EntityID = entityID;
 			data_.QuadVertexBufferPtr++;
 		}
 
@@ -245,7 +258,7 @@ namespace majkt {
 		data_.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, int entityID)
 	{
 		MAJKT_PROFILE_FUNCTION();
 
@@ -282,6 +295,7 @@ namespace majkt {
 			data_.QuadVertexBufferPtr->TexCoord = textureCoords[i];
 			data_.QuadVertexBufferPtr->TexIndex = textureIndex;
 			data_.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			data_.QuadVertexBufferPtr->EntityID = entityID;
 			data_.QuadVertexBufferPtr++;
 		}
 
@@ -321,6 +335,13 @@ namespace majkt {
 
 		DrawQuad(transform, texture, tilingFactor, tintColor);
 	}
+
+	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	{
+		if (src.Texture)
+			DrawQuad(transform, src.Texture, src.TilingFactor, src.Color, entityID);
+		else
+			DrawQuad(transform, src.Color, entityID);	}
 
 	void Renderer2D::ResetStats()
 	{

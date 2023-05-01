@@ -16,7 +16,7 @@
 #if _WIN32
 #define DEFAULT_PATH "C:\\"
 #else
-#define DEFAULT_PATH get_current_dir()
+#define DEFAULT_PATH get_current_dir() + "/src/majkt_editor/assets/scenes/"
 #endif
 
 namespace majkt {

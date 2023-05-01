@@ -7,7 +7,7 @@ namespace majkt
 {
 	namespace math
 	{
-		bool DecomposeTransform(const glm::mat4& transform, glm::vec3& outTranslation, glm::vec3& outRotation, glm::vec3& outScale);
+		bool DecomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale);
 	} // namespace math
 } // namespace majkt
 

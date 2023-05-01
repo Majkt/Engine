@@ -9,11 +9,3 @@ cc_library(
         "@glog",
     ],
 )
-
-load("//tools:cpplint.bzl", "cpplint")
-
-exports_files([
-    "CPPLINT.cfg",
-])
-
-cpplint()

@@ -117,9 +117,9 @@ namespace majkt {
 		// io.Fonts->AddFontFromFileTTF((get_current_dir() + "/src/majkt_editor/assets/fonts/opensans/static/OpenSans-Bold.ttf").c_str(), 18.0f);
 		//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 		// io.FontDefault = io.Fonts->AddFontFromFileTTF((get_current_dir() + "/src/majkt_editor/assets/fonts/opensans/static/OpenSans-Regular.ttf").c_str(), 18.0f);
-		ImFont* font = io.Fonts->AddFontFromFileTTF((get_current_dir() + "/src/majkt_editor/assets/fonts/roboto/Roboto-Regular.ttf").c_str(), 15.0f);
+		ImFont* font = io.Fonts->AddFontFromFileTTF((get_current_dir() + "/src/majkt_editor/assets/fonts/roboto/Roboto-Regular.ttf").c_str(), 16.0f);
 		IM_ASSERT(font != NULL);
-		io.Fonts->AddFontFromFileTTF((get_current_dir() + "/src/majkt_editor/assets/fonts/roboto/Roboto-Bold.ttf").c_str(), 15.0f);
+		io.Fonts->AddFontFromFileTTF((get_current_dir() + "/src/majkt_editor/assets/fonts/roboto/Roboto-Bold.ttf").c_str(), 16.0f);
 	}
 
 	void ImGuiLayer::OnDetach()

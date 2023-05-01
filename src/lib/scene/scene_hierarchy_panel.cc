@@ -6,8 +6,15 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <cstring> // For memset and strcpy
+#include <filesystem>
+
+#include <glog/logging.h>
+#include "glog/stl_logging.h"
+#include <iostream>
 
 namespace majkt {
+
+	extern const std::filesystem::path assetPath{get_current_dir() + "/src/majkt_editor/assets/"};
 
 	SceneHierarchyPanel::SceneHierarchyPanel(const std::shared_ptr<Scene>& context)
 	{
@@ -22,7 +29,7 @@ namespace majkt {
 
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
-		ImGui::Begin("Scene Hierarchy");
+		ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
 		context_->registry_.each([&](auto entityID)
 		{
@@ -37,7 +44,7 @@ namespace majkt {
 		 
 		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems))
 		{
-			if (ImGui::MenuItem("Create Empty Entity"))
+			if (ImGui::MenuItem("Create Entity"))
 				context_->CreateEntity("Empty Entity");
 
 			ImGui::EndPopup();
@@ -45,13 +52,18 @@ namespace majkt {
 
 		ImGui::End();
 
-		ImGui::Begin("Properties");
+		ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 		if (selection_context_)
 		{
 			DrawComponents(selection_context_);
 		}
 
 		ImGui::End();
+	}
+
+	void SceneHierarchyPanel::SetSelectedEntity(Entity entity)
+	{
+		selection_context_ = entity;
 	}
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
@@ -310,6 +322,25 @@ namespace majkt {
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+
+			ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+             		// const wchar_t* path = wideFilePath.c_str();
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					std::filesystem::path texturePath = std::filesystem::path(assetPath) / path;
+					std::shared_ptr<Texture2D> texture = Texture2D::Create(texturePath.string());
+					if (texture->IsLoaded())
+						component.Texture = texture;
+					else
+						LOG(WARNING) << "Could not load texture " << texturePath.filename().string();
+				}
+				ImGui::EndDragDropTarget();
+			}
+
+			ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 		});
 
 	}

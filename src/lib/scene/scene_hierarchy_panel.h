@@ -21,6 +21,8 @@ namespace majkt {
 
 		void OnImGuiRender();
 		Entity GetSelectedEntity() const { return selection_context_; }
+		void SetSelectedEntity(Entity entity);
+		
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);

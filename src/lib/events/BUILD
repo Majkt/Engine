@@ -5,6 +5,9 @@ cc_library(
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
+    deps = [
+        "//src/lib/core:core_for_editor",
+    ],
 )
 
 load("//tools:cpplint.bzl", "cpplint")

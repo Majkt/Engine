@@ -19,7 +19,7 @@ namespace majkt {
         glGenTextures(1, &renderer_id_);
         glBindTexture(GL_TEXTURE_2D, renderer_id_);
 		
-		// glTexStorage2D(GL_TEXTURE_2D, 1, internal_format_, width_, height_);
+		// glTexStorage2D(GL_TEXTURE_2D, 1, width_, width_, height_);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
@@ -37,39 +37,47 @@ namespace majkt {
 			MAJKT_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std:string&)");
 			data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 		}
-		width_ = width;
-		height_ = height;
 
-		GLenum internalFormat{0}, dataFormat{0};
-		if (channels == 4)
+		if (data)
 		{
-			internalFormat = GL_RGBA8;
-			dataFormat = GL_RGBA;
+			is_loaded_ = true;
+
+			width_ = width;
+			height_ = height;
+
+			GLenum internalFormat{0}, dataFormat{0};
+			if (channels == 4)
+			{
+				internalFormat = GL_RGBA8;
+				dataFormat = GL_RGBA;
+			}
+			else if (channels == 3)
+			{
+				internalFormat = GL_RGB8;
+				dataFormat = GL_RGB;
+			}
+
+			internal_format_ = internalFormat;
+			data_format_ = dataFormat;
+
+			if(!internalFormat & !dataFormat) LOG(FATAL) << "Format not supported!";
+
+			glGenTextures(1, &renderer_id_);
+			glBindTexture(GL_TEXTURE_2D, renderer_id_);
+			
+			// set the texture wrapping parameters
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			// set texture filtering parameters
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+			// load image, create texture and generate mipmaps
+			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width_, height_, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+
+			stbi_image_free(data);
 		}
-		else if (channels == 3)
-		{
-			internalFormat = GL_RGB8;
-			dataFormat = GL_RGB;
-		}
-
-		internal_format_ = internalFormat;
-		data_format_ = dataFormat;
-
-        glGenTextures(1, &renderer_id_);
-        glBindTexture(GL_TEXTURE_2D, renderer_id_);
-        
-        // set the texture wrapping parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		// set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		// load image, create texture and generate mipmaps
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width_, height_, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		stbi_image_free(data);
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()
