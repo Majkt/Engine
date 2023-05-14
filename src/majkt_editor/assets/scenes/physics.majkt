@@ -1,0 +1,212 @@
+Scene: Untitled
+Entities:
+  - Entity: 9854042430249781059
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [-4.91461372, -9.41348743, -1.59388494]
+      Rotation: [0.0465005375, 0.0486758947, -1.54394805]
+      Scale: [7.43839169, 1.36957848, 0.999986827]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 13737378158947811138
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [-0.91934669, -6.70949984, -1.58953857]
+      Rotation: [0, 0, -0.638996363]
+      Scale: [7.43839169, 1.36957717, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 11177358441281910859
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [5.54563427, -8.44335365, -2.32067871]
+      Rotation: [0.109696515, -0.0949245915, 0.794912577]
+      Scale: [7.28962469, 1.34218538, 0.979999185]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 9840849152207050816
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [4.54287243, -3.55006933, -0.89453119]
+      Rotation: [0.109696418, -0.0949245095, 0.734011054]
+      Scale: [7.28962469, 1.3421855, 0.979999185]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 12075688059859099456
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [2.77383709, 3.65413594, 0]
+      Rotation: [0, 0, -0.724996626]
+      Scale: [11.4587688, 1.36957777, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: /private/var/tmp/_bazel_joesuzuki/262c9972e748fc50beb171083688dea5/execroot/__main__/bazel-out/darwin_arm64-fastbuild/bin/src/majkt_editor/majkt_editor.runfiles/__main__/src/majkt_editor/assets/../../../../../../../../../../../../../../../../../Users/joesuzuki/gh/Engine/src/majkt_editor/assets/textures/wood.png
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 12961111516921565505
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [10.7810545, -9.71819687, -0.636779785]
+      Rotation: [0.0465004183, 0.0486759841, -1.54394805]
+      Scale: [5.29505968, 1.31479514, 0.959997416]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 15045535320033348975
+    TagComponent:
+      Tag: Sprite
+    TransformComponent:
+      Translation: [-0.797872126, 0.457905173, 0.519768238]
+      Rotation: [0, 0, -0.235084519]
+      Scale: [0.560000002, 0.560000002, 0.848135769]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 0.879999995
+      Friction: 0.319999993
+      Restitution: 0.819999993
+      RestitutionThreshold: 0.5
+  - Entity: 4793924497264767156
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [-2.52807808, 1.30584335, 4.35282612]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 202
+      Primary: true
+      FixedAspectRatio: false
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: true
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.00100000005, 0.00100000005]
+      Density: 1
+      Friction: 0.349999994
+      Restitution: 0.74000001
+      RestitutionThreshold: 0
+  - Entity: 16672940118998907085
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [-1.85112107, -17.1251049, -4.5456543]
+      Rotation: [0, 0, -3.14159226]
+      Scale: [35.6280022, 7.9153204, 0.872198045]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 11113802479592065601
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [-0.937757254, -0.985316157, 0]
+      Rotation: [0, 0, -0.638996363]
+      Scale: [7.43839169, 1.36957717, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: /private/var/tmp/_bazel_joesuzuki/262c9972e748fc50beb171083688dea5/execroot/__main__/bazel-out/darwin_arm64-fastbuild/bin/src/majkt_editor/majkt_editor.runfiles/__main__/src/majkt_editor/assets/../../../../../../../../../../../../../../../../../Users/joesuzuki/gh/Engine/src/majkt_editor/assets/textures/wood.png
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 0.5

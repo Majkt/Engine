@@ -18,9 +18,9 @@
 
 #include "src/lib/math/math.h"
 
-#include "src/lib/scene/entity.h"
 #include "src/lib/scene/components.h"
 #include "src/lib/scene/scene.h"
+#include "src/lib/scene/entity.h"
 #include "src/lib/scene/scriptable_entity.h"
 #include "src/lib/scene/scene_hierarchy_panel.h"
 #include "src/lib/scene/scene_serializer.h"

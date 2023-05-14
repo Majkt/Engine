@@ -31,23 +31,24 @@ namespace majkt {
 	{
 		ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
-		context_->registry_.each([&](auto entityID)
+		if (context_)
 		{
-			Entity entity{ entityID , context_.get() };
-			DrawEntityNode(entity);
-		});
+			context_->registry_.each([&](auto entityID)
+			{
+				Entity entity{entityID, context_.get()};
+				DrawEntityNode(entity);
+			});
 
-		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-			selection_context_ = {};
+			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+				selection_context_ = {};
 
-		// Right-click on blank space
-		 
-		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems))
-		{
-			if (ImGui::MenuItem("Create Entity"))
-				context_->CreateEntity("Empty Entity");
-
-			ImGui::EndPopup();
+			if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems))
+			{
+				if (ImGui::MenuItem("Create Entity"))
+					context_->CreateEntity("Empty Entity");
+ 
+				ImGui::EndPopup();
+			}
 		}
 
 		ImGui::End();
@@ -186,7 +187,7 @@ namespace majkt {
 			ImGui::PopStyleVar(
 			);
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-			if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight }))
+			if (ImGui::Button("", ImVec2{ lineHeight, lineHeight }))
 			{
 				ImGui::OpenPopup("ComponentSettings");
 			}
@@ -234,16 +235,40 @@ namespace majkt {
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			if (ImGui::MenuItem("Camera"))
+			if (!selection_context_.HasComponent<CameraComponent>())
 			{
-				selection_context_.AddComponent<CameraComponent>();
-				ImGui::CloseCurrentPopup();
+				if (ImGui::MenuItem("Camera"))
+				{
+					selection_context_.AddComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 			}
 
-			if (ImGui::MenuItem("Sprite Renderer"))
+			if (!selection_context_.HasComponent<SpriteRendererComponent>())
 			{
-				selection_context_.AddComponent<SpriteRendererComponent>();
-				ImGui::CloseCurrentPopup();
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{		
+					selection_context_.AddComponent<SpriteRendererComponent>();	
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (!selection_context_.HasComponent<Rigidbody2DComponent>())
+			{
+				if (ImGui::MenuItem("Rigidbody 2D"))
+				{
+					selection_context_.AddComponent<Rigidbody2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (!selection_context_.HasComponent<BoxCollider2DComponent>())
+			{
+				if (ImGui::MenuItem("Box Collider 2D"))
+				{
+					selection_context_.AddComponent<BoxCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 			}
 
 			ImGui::EndPopup();
@@ -270,7 +295,7 @@ namespace majkt {
 			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
 			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
 			{
-				for (int i = 0; i < 2; i++)
+				for (int i = 0; i < 2; i)
 				{
 					bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
 					if (ImGui::Selectable(projectionTypeStrings[i], isSelected))
@@ -341,6 +366,41 @@ namespace majkt {
 			}
 
 			ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+		});
+
+		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)
+		{
+			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic"};
+			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+			if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+					if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+					{
+						currentBodyTypeString = bodyTypeStrings[i];
+						component.Type = (Rigidbody2DComponent::BodyType)i;
+					}
+
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+		});
+
+		DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+			ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
+			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
 		});
 
 	}

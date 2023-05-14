@@ -25,11 +25,15 @@ namespace majkt {
 		void NewScene();
 		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
+		void SaveScene();
 		void SaveSceneAs();
+
+		void SerializeScene(std::shared_ptr<Scene> scene, const std::filesystem::path& path);
 
 		void OnScenePlay();
 		void OnSceneStop();
 
+		void OnDuplicateEntity();
 		void UI_Toolbar();
 
 		majkt::OrthographicCameraController camera_controller_;
@@ -39,6 +43,8 @@ namespace majkt {
 		std::shared_ptr<Framebuffer> framebuffer_;
 
 		std::shared_ptr<Scene> active_scene_;
+		std::shared_ptr<Scene> editor_scene_;
+		std::filesystem::path editor_scene_path_;
 		Entity square_entity_;
 		Entity camera_entity_;
 		Entity second_camera_;

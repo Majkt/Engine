@@ -41,7 +41,6 @@ namespace majkt {
 		// Creates Scene
 		active_scene_ = std::make_shared<Scene>();
 		editor_camera_ = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
-		scene_hierarchy_panel_.SetContext(active_scene_);
 	}
 
 	void EditorLayer::OnDetach()
@@ -333,6 +332,7 @@ namespace majkt {
 		active_scene_ = std::make_shared<Scene>();
 		active_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 		scene_hierarchy_panel_.SetContext(active_scene_);
+		editor_scene_path_ = std::filesystem::path();
 	}
 
 	void EditorLayer::OpenScene()
@@ -344,19 +344,36 @@ namespace majkt {
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
+		if (scene_state_ != SceneState::Edit)
+			OnSceneStop();
+
 		if (path.extension().string() != ".majkt")
 		{
 			LOG(WARNING) << "Could not load " << path.filename().string() << " - not a scene file";
 			return;
 		}
 
-		active_scene_ = std::make_shared<Scene>();
-		active_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-		scene_hierarchy_panel_.SetContext(active_scene_);
+		std::shared_ptr<Scene> newScene = std::make_shared<Scene>();
+		LOG(INFO) << "Loading scene " << path.filename().string();
+		SceneSerializer serializer(newScene);
 
-		SceneSerializer serializer(active_scene_);
-		serializer.Deserialize(path);
+		if (serializer.Deserialize(path.string()))
+		{
+			editor_scene_ = newScene;
+			editor_scene_->OnViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+			scene_hierarchy_panel_.SetContext(editor_scene_);			
+			active_scene_ = editor_scene_;
+			editor_scene_path_ = path;
+		}
 	}
+
+	void EditorLayer::SaveScene()
+	{
+		if (!editor_scene_path_.empty())
+			SerializeScene(active_scene_, editor_scene_path_);
+		else
+			SaveSceneAs();
+ 	}
 
 	void EditorLayer::SaveSceneAs()
 	{
@@ -364,9 +381,15 @@ namespace majkt {
 		if (!filepath.empty())
 		{
 			filepath += ".majkt";
-			SceneSerializer serializer(active_scene_);
-			serializer.Serialize(filepath);
+			SerializeScene(active_scene_, filepath);
+			editor_scene_path_ = filepath;
 		}
+	}
+
+	void EditorLayer::SerializeScene(std::shared_ptr<Scene> scene, const std::filesystem::path& path)
+	{
+		SceneSerializer serializer(scene);
+		serializer.Serialize(path.string());
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -396,10 +419,22 @@ namespace majkt {
 			case Key::S:
 			{
 				if (control || command)
-					SaveSceneAs();
+				{
+					if (shift)
+						SaveSceneAs();
+					else
+						SaveScene();
+				}
 				break;
 			}
 			
+			case Key::D:
+			{
+				if (control || command)
+					OnDuplicateEntity();
+ 				break;
+ 			}
+
 			case Key::Q:
 			{
 				if (command)
@@ -433,7 +468,10 @@ namespace majkt {
 	void EditorLayer::OnEvent(Event& e)
 	{
 		camera_controller_.OnEvent(e);
-		editor_camera_.OnEvent(e);
+		if (scene_state_ == SceneState::Edit)
+		{
+			editor_camera_.OnEvent(e);
+		}
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(absl::bind_front(&EditorLayer::OnKeyPressed, this));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(absl::bind_front(&EditorLayer::OnMouseButtonPressed, this));
@@ -442,12 +480,27 @@ namespace majkt {
 	void EditorLayer::OnScenePlay()
 	{
 		scene_state_ = SceneState::Play;
+		active_scene_ = Scene::Copy(editor_scene_);
+		active_scene_->OnRuntimeStart();
+		scene_hierarchy_panel_.SetContext(active_scene_);
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
 		scene_state_ = SceneState::Edit;
-
+		active_scene_->OnRuntimeStop();
+		active_scene_ = editor_scene_;
+		scene_hierarchy_panel_.SetContext(active_scene_);
 	}
+ 
+	void EditorLayer::OnDuplicateEntity()
+	{
+		if (scene_state_ != SceneState::Edit)
+			return;
+
+		Entity selectedEntity = scene_hierarchy_panel_.GetSelectedEntity();
+		if (selectedEntity)
+			editor_scene_->DuplicateEntity(selectedEntity);
+ 	}
 
 }

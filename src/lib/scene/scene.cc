@@ -2,11 +2,34 @@
 
 #include "src/lib/scene/components.h"
 #include "src/lib/scene/entity.h"
+#include "src/lib/scene/scriptable_entity.h"
 #include "src/lib/renderer/renderer2D.h"
 
 #include <glm/glm.hpp>
 
+// Box2D
+#include "box2d/b2_world.h"
+#include "box2d/b2_body.h"
+#include "box2d/b2_fixture.h"
+#include "box2d/b2_polygon_shape.h"
+
+#include <glog/logging.h>
+#include "glog/stl_logging.h"
+#include <iostream>
+
 namespace majkt {
+
+	static b2BodyType Rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType bodyType)
+	{
+		switch (bodyType)
+		{
+			case Rigidbody2DComponent::BodyType::Static:    return b2_staticBody;
+			case Rigidbody2DComponent::BodyType::Dynamic:   return b2_dynamicBody;
+			case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
+		}
+		LOG(WARNING) << "Unknown Rigidbody2DComponent::BodyType: ";
+		return b2_staticBody;
+	}
 
 	Scene::Scene()
 	{
@@ -16,10 +39,69 @@ namespace majkt {
 	{
 	}
 
+	template<typename Component>
+	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<Uuid, entt::entity>& enttMap)
+	{
+		auto view = src.view<Component>();
+		for (auto e : view)
+		{
+			Uuid uuid = src.get<IDComponent>(e).ID;
+			if(enttMap.find(uuid) == enttMap.end()) LOG(FATAL) << "Entity not found in map!";
+			entt::entity dstEnttID = enttMap.at(uuid);
+
+			auto& component = src.get<Component>(e);
+			dst.emplace_or_replace<Component>(dstEnttID, component);
+		}
+	}
+
+	template<typename Component>
+	static void CopyComponentIfExists(Entity dst, Entity src)
+	{
+		if (src.HasComponent<Component>())
+			dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+	}
+
+	std::shared_ptr<Scene> Scene::Copy(std::shared_ptr<Scene> other)
+	{
+		std::shared_ptr<Scene> newScene = std::make_shared<Scene>();
+
+		newScene->viewport_width_ = other->viewport_width_;
+		newScene->viewport_height_ = other->viewport_height_;
+
+		auto& srcSceneRegistry = other->registry_;
+		auto& dstSceneRegistry = newScene->registry_;
+		std::unordered_map<Uuid, entt::entity> enttMap;
+
+		// Create entities in new scene
+		auto idView = srcSceneRegistry.view<IDComponent>();
+		for (auto e : idView)
+		{
+			Uuid uuid = srcSceneRegistry.get<IDComponent>(e).ID;
+			const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
+			Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
+			enttMap[uuid] = (entt::entity)newEntity;
+		}
+
+		CopyComponent<TransformComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<SpriteRendererComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<CameraComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<NativeScriptComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Rigidbody2DComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<BoxCollider2DComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+
+		return newScene;
+	}
+
 	Entity Scene::CreateEntity(const std::string& name)
+		{
+		return CreateEntityWithUUID(Uuid(), name);
+	}
+
+	Entity Scene::CreateEntityWithUUID(Uuid uuid, const std::string& name)
 	{
 		Entity entity = { registry_.create(), this };
 		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<IDComponent>(uuid);
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name == "Empty Entity" ? "Empty Entity 0": name;
 		return entity;
@@ -28,6 +110,50 @@ namespace majkt {
 	void Scene::DestroyEntity(Entity entity)
 	{
 		registry_.destroy(entity);
+	}
+
+	void Scene::OnRuntimeStart()
+	{
+		physics_world_ = new b2World({ 0.0f, -9.8f });
+
+		auto view = registry_.view<Rigidbody2DComponent>();
+		for (auto e : view)
+		{
+			Entity entity = { e, this };
+			auto& transform = entity.GetComponent<TransformComponent>();
+			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+
+			b2BodyDef bodyDef;
+			bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
+			bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
+			bodyDef.angle = transform.Rotation.z;
+
+			b2Body* body = physics_world_->CreateBody(&bodyDef);
+			body->SetFixedRotation(rb2d.FixedRotation);
+			rb2d.RuntimeBody = body;
+
+			if (entity.HasComponent<BoxCollider2DComponent>())
+			{
+				auto& bc2d = entity.GetComponent<BoxCollider2DComponent>();
+
+				b2PolygonShape boxShape;
+				boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
+
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape = &boxShape;
+				fixtureDef.density = bc2d.Density;
+				fixtureDef.friction = bc2d.Friction;
+				fixtureDef.restitution = bc2d.Restitution;
+				fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
+				body->CreateFixture(&fixtureDef);
+			}
+		}
+	}
+
+	void Scene::OnRuntimeStop()
+	{
+		delete physics_world_;
+		physics_world_ = nullptr;
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
@@ -46,6 +172,29 @@ namespace majkt {
 				nsc.Instance->OnUpdate(ts);
 			});
 		}
+
+		// Physics
+		{
+			const int32_t velocityIterations = 6;
+			const int32_t positionIterations = 2;
+			physics_world_->Step(ts, velocityIterations, positionIterations);
+
+			// Retrieve transform from Box2D
+			auto view = registry_.view<Rigidbody2DComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				auto& transform = entity.GetComponent<TransformComponent>();
+				auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+
+				b2Body* body = (b2Body*)rb2d.RuntimeBody;
+				const auto& position = body->GetPosition();
+				transform.Translation.x = position.x;
+				transform.Translation.y = position.y;
+				transform.Rotation.z = body->GetAngle();
+			}
+		}
+
 
 		// Render 2D
 		Camera* mainCamera = nullptr;
@@ -113,6 +262,11 @@ namespace majkt {
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
 	}
+	
+	template<>
+	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component)
+	{
+	}
 
 	template<>
 	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
@@ -128,6 +282,19 @@ namespace majkt {
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
 	{
+	}
+
+	void Scene::DuplicateEntity(Entity entity)
+	{
+		std::string name = entity.GetName();
+		Entity newEntity = CreateEntity(name);
+
+		CopyComponentIfExists<TransformComponent>(newEntity, entity);
+		CopyComponentIfExists<SpriteRendererComponent>(newEntity, entity);
+		CopyComponentIfExists<CameraComponent>(newEntity, entity);
+		CopyComponentIfExists<NativeScriptComponent>(newEntity, entity);
+		CopyComponentIfExists<Rigidbody2DComponent>(newEntity, entity);
+		CopyComponentIfExists<BoxCollider2DComponent>(newEntity, entity);
 	}
 
 	Entity Scene::GetPrimaryCameraEntity()
@@ -152,4 +319,13 @@ namespace majkt {
 	{
 	}
 
+	template<>
+	void Scene::OnComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
+	{
+	}
 }
