@@ -8,7 +8,6 @@
 		/* Windows x64  */
 		#define MAJKT_PLATFORM_WINDOWS
 	#else
-		/* Windows x86 */
 		#error "x86 Builds are not supported!"
 	#endif
 #elif defined(__APPLE__) || defined(__MACH__)

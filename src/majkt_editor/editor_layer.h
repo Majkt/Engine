@@ -50,8 +50,6 @@ namespace majkt {
 		Entity second_camera_;
 		Entity hovered_entity_;
 
-		bool primary_camera_{true};
-
 		EditorCamera editor_camera_;
 
 		std::shared_ptr<Texture2D> checker_board_texture_, style_texture_;

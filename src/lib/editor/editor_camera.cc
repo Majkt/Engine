@@ -16,7 +16,7 @@
 namespace majkt {
 
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
-		: FOV_(fov), aspect_ratio_(aspectRatio), near_clip_(nearClip), far_clip_(farClip), Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
+		: Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip)), FOV_(fov), aspect_ratio_(aspectRatio), near_clip_(nearClip), far_clip_(farClip)
 	{
 		UpdateView();
 	}

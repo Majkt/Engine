@@ -2,13 +2,24 @@ Scene: Untitled
 Entities:
   - Entity: 12837192831273
     TagComponent:
-      Tag: Top
+      Tag: Left
     TransformComponent:
-      Translation: [0, 0.5, 0]
-      Rotation: [1.57079637, 0.785398185, 0]
+      Translation: [-0.355000019, 0, 0.349999964]
+      Rotation: [0, -0.785398245, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [0.945147693, 0.622122526, 0, 1]
+      Color: [0.435827136, 0, 0.860759497, 1]
+      TilingFactor: 1
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Right
+    TransformComponent:
+      Translation: [0.351482719, 0, 0.348884732]
+      Rotation: [0, 0.785398245, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.448645592, 0, 0.886075974, 1]
+      TilingFactor: 1
   - Entity: 12837192831273
     TagComponent:
       Tag: Camera
@@ -18,30 +29,22 @@ Entities:
       Scale: [1, 1, 1]
     CameraComponent:
       Camera:
-        ProjectionType: 0
+        ProjectionType: 1
         PerspectiveFOV: 0.52359879
         PerspectiveNear: 0.00999999978
         PerspectiveFar: 1000
         OrthographicSize: 10
         OrthographicNear: -1
-        OrthographicFar: 1
+        OrthographicFar: 4
       Primary: true
       FixedAspectRatio: false
   - Entity: 12837192831273
     TagComponent:
-      Tag: Right
+      Tag: Top
     TransformComponent:
-      Translation: [0.351482719, 0, 0.348884732]
-      Rotation: [0, 0.785398245, 0]
-      Scale: [1, 1, 1]
+      Translation: [1.4901163e-08, 0.5, 1.49011585e-08]
+      Rotation: [1.57079649, 0.785398245, 4.21468513e-08]
+      Scale: [1, 0.999999523, 0.999999642]
     SpriteRendererComponent:
-      Color: [0.886075974, 0.560807586, 0, 1]
-  - Entity: 12837192831273
-    TagComponent:
-      Tag: Left
-    TransformComponent:
-      Translation: [-0.354999989, 0, 0.349999994]
-      Rotation: [0, -0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.860759497, 0.544784486, 0, 1]
+      Color: [0.45462817, 0, 0.945147693, 1]
+      TilingFactor: 1

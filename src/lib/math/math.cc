@@ -9,7 +9,6 @@ namespace majkt {
         bool DecomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale)
         {
             // From glm::decompose in matrix_decompose.inl
-
             using namespace glm;
             using T = float;
 
@@ -52,18 +51,7 @@ namespace majkt {
             // At this point, the matrix (in rows[]) is orthonormal.
             // Check for a coordinate system flip.  If the determinant
             // is -1, then negate the matrix and the scaling factors.
-    #if 0
-            Pdum3 = cross(Row[1], Row[2]); // v3Cross(row[1], row[2], Pdum3);
-            if (dot(Row[0], Pdum3) < 0)
-            {
-                for (length_t i = 0; i < 3; i++)
-                {
-                    scale[i] *= static_cast<T>(-1);
-                    Row[i] *= static_cast<T>(-1);
-                }
-            }
-    #endif
-
+            
             rotation.y = asin(-Row[0][2]);
             if (cos(rotation.y) != 0) {
                 rotation.x = atan2(Row[1][2], Row[2][2]);

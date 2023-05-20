@@ -114,37 +114,50 @@ namespace majkt {
 
 	void Scene::OnRuntimeStart()
 	{
+		// Create a Box2D physics world with gravity
 		physics_world_ = new b2World({ 0.0f, -9.8f });
-
+		
+		// Iterate over entities with Rigidbody2DComponent
 		auto view = registry_.view<Rigidbody2DComponent>();
 		for (auto e : view)
 		{
+			// Create an Entity object for the current entity
 			Entity entity = { e, this };
+			
+			// Retrieve the TransformComponent and Rigidbody2DComponent for the entity
 			auto& transform = entity.GetComponent<TransformComponent>();
 			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
+			
+			// Create a Box2D body definition
 			b2BodyDef bodyDef;
 			bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
 			bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
 			bodyDef.angle = transform.Rotation.z;
-
+			
+			// Create a Box2D body based on the body definition
 			b2Body* body = physics_world_->CreateBody(&bodyDef);
 			body->SetFixedRotation(rb2d.FixedRotation);
 			rb2d.RuntimeBody = body;
-
+			
+			// Check if the entity has a BoxCollider2DComponent
 			if (entity.HasComponent<BoxCollider2DComponent>())
 			{
+				// Retrieve the BoxCollider2DComponent for the entity
 				auto& bc2d = entity.GetComponent<BoxCollider2DComponent>();
-
+				
+				// Create a Box2D polygon shape for the box collider
 				b2PolygonShape boxShape;
 				boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
-
+				
+				// Create a Box2D fixture definition
 				b2FixtureDef fixtureDef;
 				fixtureDef.shape = &boxShape;
 				fixtureDef.density = bc2d.Density;
 				fixtureDef.friction = bc2d.Friction;
 				fixtureDef.restitution = bc2d.Restitution;
 				fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
+				
+				// Attach the fixture to the Box2D body
 				body->CreateFixture(&fixtureDef);
 			}
 		}

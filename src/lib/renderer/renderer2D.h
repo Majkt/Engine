@@ -12,6 +12,10 @@ namespace majkt {
 	class EditorCamera;
 	struct SpriteRendererComponent;
 
+	// This defines a Renderer2D class that provides functions for rendering 2D graphics using OpenGL.
+	// It includes functions for drawing quads, rotated quads, and sprites with various parameters such as
+	// position, size, color, and texture. The class also provides functions for beginning and ending a scene,
+	// flushing the batch, and resetting and getting statistics for the number of draw calls and quads rendered.
 	class Renderer2D
 	{
 	public:

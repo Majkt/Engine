@@ -51,7 +51,7 @@ class Event
             return GetCategoryFlags() & category;
         }
         // Check if the event has been handled.
-        bool handled_ = false;
+        bool handled_{false};
 };
 
 class EventDispatcher

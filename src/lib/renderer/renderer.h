@@ -7,6 +7,12 @@
 
 namespace majkt {
 
+	// Defines a Renderer class that provides functionality for rendering graphics using a specific API.
+	// The class has methods for initializing and shutting the renderer, handling window resize events, beginning
+	// and ending a scene, and submitting data to be rendered. The class also contains a private SceneData struct
+	// that stores the view projection matrix used for rendering. The Renderer class is designed to work with an
+	// OrthographicCamera and a Shader, and it uses a VertexArray to specify the geometry to be rendered.
+
 	class Renderer
 	{
         public:

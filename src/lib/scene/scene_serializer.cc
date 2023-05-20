@@ -261,14 +261,10 @@ namespace majkt {
 
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
-		std::ifstream stream(filepath);
-		std::stringstream strStream;
-		strStream << stream.rdbuf();
-
 		YAML::Node data;
 		try
 		{
-			data = YAML::Load(strStream.str());
+			data = YAML::LoadFile(filepath);
 		}
 		catch (YAML::ParserException e)
 		{
@@ -312,8 +308,7 @@ namespace majkt {
 					auto& cc = deserializedEntity.AddComponent<CameraComponent>();
 
 					auto cameraProps = cameraComponent["Camera"];
-					LOG(INFO) << "5555 camera component";
-					// cc.Camera.SetProjectionType((SceneCamera::ProjectionType)cameraProps["ProjectionType"].as<int>());
+					cc.Camera.SetProjectionType((SceneCamera::ProjectionType)cameraProps["ProjectionType"].as<int>());
 
 					cc.Camera.SetPerspectiveVerticalFOV(cameraProps["PerspectiveFOV"].as<float>());
 					cc.Camera.SetPerspectiveNearClip(cameraProps["PerspectiveNear"].as<float>());

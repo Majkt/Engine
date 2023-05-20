@@ -56,40 +56,61 @@ namespace majkt {
 		if (columnCount < 1)
 			columnCount = 1;
 
+		// Set the number of columns for layout using ImGui
 		ImGui::Columns(columnCount, 0, false);
 
+		// Iterate through each directory entry in the current directory
 		for (auto& directoryEntry : std::filesystem::directory_iterator(current_directory_))
 		{
+			// Extract the path and relative path from the directory entry
 			const auto& path = directoryEntry.path();
 			auto relativePath = std::filesystem::relative(path, asset_path_);
+			
 			std::string filenameString = relativePath.filename().string();
 			
-            ImGui::PushID(filenameString.c_str());
-            std::shared_ptr<Texture2D> icon = directoryEntry.is_directory() ? directory_icon_ : file_icon_;
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+			// Push an identifier for ImGui using the filename string
+			ImGui::PushID(filenameString.c_str());
+			
+			// Determine the appropriate icon based on whether the entry is a directory or file
+			std::shared_ptr<Texture2D> icon = directoryEntry.is_directory() ? directory_icon_ : file_icon_;
+			
+			// Customize the button style to have no background color
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+			
+			// Display an image button with the icon texture and specified thumbnail size
 			ImGui::ImageButton((ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-            if (ImGui::BeginDragDropSource())
+			
+			if (ImGui::BeginDragDropSource())
 			{
-                std::wstring wideFilePath = relativePath.wstring();
-                const wchar_t* itemPath = wideFilePath.c_str();
-
+				std::wstring wideFilePath = relativePath.wstring();
+				const wchar_t* itemPath = wideFilePath.c_str();
+				
+				// Set the drag and drop payload with the item path
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
 				ImGui::EndDragDropSource();
 			}
-
+			
+			// Restore the button style color
 			ImGui::PopStyleColor();
+			
+			// Check if the item is hovered and left mouse button is clicked
 			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-            {
-                if (directoryEntry.is_directory())
-                {
-                    current_directory_ /= path.filename();
-                }
-            }  
-            ImGui::TextWrapped(filenameString.c_str());
-			ImGui::NextColumn(); 
-            ImGui::PopID();
+			{
+				if (directoryEntry.is_directory())
+				{
+					current_directory_ /= path.filename();
+				}
+			}
+			
+			ImGui::TextWrapped(filenameString.c_str());
+			
+			// Move to the next column for layout
+			ImGui::NextColumn();
+			
+			ImGui::PopID();
 		}
 
+		// Reset the columns to a single column for subsequent content
 		ImGui::Columns(1);
 
 		// ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);

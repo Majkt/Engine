@@ -15,6 +15,9 @@ namespace majkt {
 
 	class Entity;
 
+	// This defines a class called "Scene" which represents a scene in a game engine.
+	// It has methods for creating and destroying entities within the scene, updating
+	// the scene during runtime and in the editor, and getting the primary camera entity.
 	class Scene
 	{
 	public:

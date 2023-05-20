@@ -3,14 +3,12 @@
 
 namespace majkt 
 {
-
 	class Timestep
 	{
 	public:
 		Timestep(float time = 0.0f)
 			: time_(time)
-		{
-		}
+		{}
 
 		operator float() const { return time_; }
 
@@ -19,7 +17,6 @@ namespace majkt
 	private:
 		float time_;
 	};
-
 } // namespace majkt
 
 #endif  // MAJKT_ENGINE_TIMESTEP_H_

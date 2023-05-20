@@ -99,9 +99,14 @@ namespace majkt {
 		int mouseX = (int)mx;
 		int mouseY = (int)my;
 
+		// Check if the mouse position is within the boundaries of the viewport
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
+			// Read the pixel data at the mouse position from the framebuffer
 			int pixelData = framebuffer_->ReadPixel(1, mouseX, mouseY);
+			
+			// If the pixel data is -1, set the hovered entity to an empty Entity object,
+			// otherwise, create an Entity object using the pixel data as the entity identifier
 			hovered_entity_ = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, active_scene_.get());
 		}
 		framebuffer_->Unbind();
@@ -193,14 +198,14 @@ namespace majkt {
 		content_browser_panel_.OnImGuiRender();
 		ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar );
 
-		// std::string name{"None"};
-		// if (hovered_entity_)
-		// 	name = hovered_entity_.GetComponent<TagComponent>().Tag;
-		// ImGui::Text("Hovered Entity: %s", name.c_str());
+		std::string name{"None"};
+		if (hovered_entity_)
+			name = hovered_entity_.GetComponent<TagComponent>().Tag;
+		ImGui::Text("Hovered Entity: %s", name.c_str());
 
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
-		// ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
@@ -226,13 +231,20 @@ namespace majkt {
 		uint64_t textureID = framebuffer_->GetColorAttachmentRendererID();
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ viewport_size_.x, viewport_size_.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
+		// Begin a drag and drop target with ImGui
 		if (ImGui::BeginDragDropTarget())
 		{
+			// Check if a payload of type "CONTENT_BROWSER_ITEM" is accepted
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
+				// Extract the path from the payload data
 				const wchar_t* path = (const wchar_t*)payload->Data;
+
+				// Open the scene using the provided asset path and the extracted path
 				OpenScene(std::filesystem::path(asset_path_) / path);
 			}
+			
+			// End the drag and drop target
 			ImGui::EndDragDropTarget();
 		}
 
@@ -246,10 +258,6 @@ namespace majkt {
 			ImGuizmo::SetRect(viewport_bounds_[0].x, viewport_bounds_[0].y, viewport_bounds_[1].x - viewport_bounds_[0].x, viewport_bounds_[1].y - viewport_bounds_[0].y);
 
 			// Camera
-			// auto cameraEntity = active_scene_->GetPrimaryCameraEntity();
-			// const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			// const glm::mat4& cameraProjection = camera.GetProjection();
-			// glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
 			const glm::mat4& cameraProjection = editor_camera_.GetProjection();
 			glm::mat4 cameraView = editor_camera_.GetViewMatrix();
 
@@ -319,10 +327,16 @@ namespace majkt {
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
 	{
+		// Check if the left mouse button is pressed
 		if (e.GetMouseButton() == Mouse::ButtonLeft)
 		{
+			// Check if the viewport is being hovered, ImGuizmo is not being interacted with,
+			// and the left Alt key is not pressed
 			if (viewport_hovered_ && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+			{
+				// Set the selected entity in the scene hierarchy panel to the hovered entity
 				scene_hierarchy_panel_.SetSelectedEntity(hovered_entity_);
+			}
 		}
 		return false;
 	}
